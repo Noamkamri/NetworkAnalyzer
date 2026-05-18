@@ -50,36 +50,85 @@
                     </TextBox.Resources>
                 </TextBox>
 
-                <Button x:Name="StopButton"
-                        Grid.Column="2"
-                        Content="Stop Sniffing"
-                        Margin="12,0,0,0"
-                        Padding="18,0"
-                        Height="32"
-                        Background="#DC2626"
-                        Foreground="White"
-                        FontWeight="SemiBold"
-                        Cursor="Hand"
-                        Click="StopButton_Click">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="StopBorder" Background="{TemplateBinding Background}" CornerRadius="4">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="StopBorder" Property="Background" Value="#B91C1C"/>
-                                </Trigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter TargetName="StopBorder" Property="Background" Value="#1E2535"/>
-                                    <Setter Property="Opacity" Value="0.6"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+				<Grid Grid.Column="2" Margin="12,0,0,0">
+					<Button x:Name="StopButton"
+                            Content="Stop Sniffing"
+                            Padding="18,0"
+                            Height="32"
+                            Background="#DC2626"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Cursor="Hand"
+                            Click="StopButton_Click">
+						<Button.Template>
+							<ControlTemplate TargetType="Button">
+								<Border x:Name="StopBorder" Background="{TemplateBinding Background}" CornerRadius="4">
+									<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+								</Border>
+								<ControlTemplate.Triggers>
+									<Trigger Property="IsMouseOver" Value="True">
+										<Setter TargetName="StopBorder" Property="Opacity" Value="0.8"/>
+									</Trigger>
+									<Trigger Property="IsEnabled" Value="False">
+										<Setter TargetName="StopBorder" Property="Background" Value="#1E2535"/>
+										<Setter Property="Opacity" Value="0.6"/>
+									</Trigger>
+								</ControlTemplate.Triggers>
+							</ControlTemplate>
+						</Button.Template>
+					</Button>
 
-                <Button x:Name="SavePcapButton"
+					<StackPanel x:Name="spResumeOptions" Orientation="Horizontal" Visibility="Collapsed">
+						<Button x:Name="btnContinue"
+                                Content="Continue"
+                                Click="BtnContinue_Click"
+                                Padding="15,0"
+                                Height="32"
+                                Margin="0,0,8,0"
+                                Background="#3B82F6"
+                                Foreground="White"
+                                FontWeight="SemiBold"
+                                Cursor="Hand">
+							<Button.Template>
+								<ControlTemplate TargetType="Button">
+									<Border x:Name="ContBorder" Background="{TemplateBinding Background}" CornerRadius="4">
+										<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+									</Border>
+									<ControlTemplate.Triggers>
+										<Trigger Property="IsMouseOver" Value="True">
+											<Setter TargetName="ContBorder" Property="Background" Value="#2563EB"/>
+										</Trigger>
+									</ControlTemplate.Triggers>
+								</ControlTemplate>
+							</Button.Template>
+						</Button>
+
+						<Button x:Name="btnNewSession"
+                                Content="New Session"
+                                Click="BtnNewSession_Click"
+                                Padding="15,0"
+                                Height="32"
+                                Background="#10B981"
+                                Foreground="White"
+                                FontWeight="SemiBold"
+                                Cursor="Hand">
+							<Button.Template>
+								<ControlTemplate TargetType="Button">
+									<Border x:Name="NewBorder" Background="{TemplateBinding Background}" CornerRadius="4">
+										<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+									</Border>
+									<ControlTemplate.Triggers>
+										<Trigger Property="IsMouseOver" Value="True">
+											<Setter TargetName="NewBorder" Property="Background" Value="#059669"/>
+										</Trigger>
+									</ControlTemplate.Triggers>
+								</ControlTemplate>
+							</Button.Template>
+						</Button>
+					</StackPanel>
+				</Grid>
+
+				<Button x:Name="SavePcapButton"
                         Grid.Column="3"
                         Content="Save to PCAP"
                         IsEnabled="False"

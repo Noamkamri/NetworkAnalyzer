@@ -33,6 +33,8 @@ namespace NetworkScanner
 
         private int _totalScannedPackets = 0;
 
+        private ICaptureDevice _currentDevice;
+
         // --- Class Members for Evil Twin Defense ---
         private DispatcherTimer _securityTimer;
         private string _baselineBssid = "";
@@ -48,6 +50,7 @@ namespace NetworkScanner
         private StreamWriter _serverWriter;
         private RSACryptoServiceProvider _rsaClient;
 
+        private bool hasPreviousData = false;
         public ObservableCollection<PacketScanner.PacketInfo> Packets { get; }
             = new ObservableCollection<PacketScanner.PacketInfo>();
 
@@ -58,6 +61,8 @@ namespace NetworkScanner
             InitializeComponent();
 
             PacketsGrid.ItemsSource = Packets;
+
+            _currentDevice = device;
 
             scanner = new PacketScanner();
             scanner.SetUI(this);
@@ -329,13 +334,76 @@ namespace NetworkScanner
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!_isSniffing) return;
-            scanner.Stop();
-            _isSniffing = false;
-            StopButton.IsEnabled = false;
-            StopButton.Content = "Stopped";
-            StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E2535"));
-            SavePcapButton.IsEnabled = true;
+            if (_isSniffing)
+            {
+                // עוצר את ההסנפה במחלקת ה-PacketScanner
+                // (אם הפונקציה שלך נקראת בשם אחר כמו StopCapture, שנה בהתאם)
+                scanner.Stop();
+
+                _isSniffing = false;
+                hasPreviousData = true;
+
+                StopButton.Content = "Start Sniffing";
+                StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")); // צבע ירוק
+
+                // מדליק את האפשרות לשמור קובץ
+                SavePcapButton.IsEnabled = true;
+            }
+            else
+            {
+                if (hasPreviousData)
+                {
+                    // מעלים את הכפתור הראשי ומציג את שתי האפשרויות
+                    StopButton.Visibility = Visibility.Collapsed;
+                    spResumeOptions.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    // מפעיל מחדש אם איכשהו הגענו לפה בלי נתונים
+                    scanner.Start(_currentDevice);
+                    _isSniffing = true;
+                    StopButton.Content = "Stop Sniffing";
+                    StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626")); // חזרה לאדום
+                    SavePcapButton.IsEnabled = false;
+                }
+            }
+        }
+
+        private void BtnContinue_Click(object sender, RoutedEventArgs e)
+        {
+            // מחזיר את התצוגה של הכפתור הראשי
+            spResumeOptions.Visibility = Visibility.Collapsed;
+            StopButton.Visibility = Visibility.Visible;
+
+            StopButton.Content = "Stop Sniffing";
+            StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626"));
+
+            _isSniffing = true;
+            SavePcapButton.IsEnabled = false;
+
+            // ממשיך את ההסנפה בלי למחוק כלום מהמסך
+            scanner.Start(_currentDevice);
+        }
+
+        private void BtnNewSession_Click(object sender, RoutedEventArgs e)
+        {
+            // מחזיר את התצוגה של הכפתור הראשי
+            spResumeOptions.Visibility = Visibility.Collapsed;
+            StopButton.Visibility = Visibility.Visible;
+
+            StopButton.Content = "Stop Sniffing";
+            StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626"));
+
+            _isSniffing = true;
+            SavePcapButton.IsEnabled = false;
+
+            // מאפס את כל הנתונים במסך ומוחק סטטיסטיקות
+            Packets.Clear();
+            _totalScannedPackets = 0;
+            // *אם יש לך פונקציה ב-scanner שמאפסת סטטיסטיקות, קרא לה פה*
+
+            // מתחיל הסנפה נקייה לגמרי
+            scanner.Start(_currentDevice);
         }
 
         private void SavePcapButton_Click(object sender, RoutedEventArgs e)

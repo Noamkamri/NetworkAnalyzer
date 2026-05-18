@@ -1,0 +1,59 @@
+﻿<Window x:Class="ScannerServer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="NetSentinel - Central Management Console" Height="600" Width="900"
+        Background="#0D0F12">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="0,0,0,20">
+            <TextBlock Text="CENTRAL SERVER" Foreground="#3B82F6" FontSize="28" FontWeight="Black"/>
+            <TextBlock Text="Distributed Network Monitoring System" Foreground="#64748B" FontSize="14"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl x:Name="AgentsList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="#141720" CornerRadius="8" Margin="0,0,0,15" Padding="15" BorderBrush="#1E2535" BorderThickness="1">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding IP}" Foreground="White" FontSize="18" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding Status}" Foreground="#10B981" FontSize="12"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                        <TextBlock Text="Traffic Monitored:" Foreground="#64748B" FontSize="11" HorizontalAlignment="Right"/>
+                                        <TextBlock Text="{Binding TotalPackets, StringFormat={}{0} Packets}" Foreground="White" FontSize="16" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Expander Header="View Security Alerts" Foreground="#94A3B8" Margin="0,10,0,0">
+                                    <ItemsControl ItemsSource="{Binding AgentAlerts}" Margin="5,10,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#1A1F2E" Margin="0,2" Padding="8" CornerRadius="4">
+                                                    <TextBlock Text="{Binding}" Foreground="#FCA5A5" FontSize="12" TextWrapping="Wrap"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Window>

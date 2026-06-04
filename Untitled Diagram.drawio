@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" version="28.2.8">
+  <diagram name="Page-1" id="qZ7XV4MUS3rLwtqJH2Rk">
+    <mxGraphModel dx="815" dy="433" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="8BgL7pL5LaJh27u9AvMq-4" target="8BgL7pL5LaJh27u9AvMq-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="8BgL7pL5LaJh27u9AvMq-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="430" y="320" as="sourcePoint" />
+            <mxPoint x="430" y="230" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="420" y="230" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="8BgL7pL5LaJh27u9AvMq-3" target="8BgL7pL5LaJh27u9AvMq-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="8BgL7pL5LaJh27u9AvMq-1" target="8BgL7pL5LaJh27u9AvMq-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-1" value="&lt;span id=&quot;docs-internal-guid-43ff6b61-7fff-41c6-71e0-c006050dde60&quot;&gt;&lt;span style=&quot;font-size: 11pt; font-family: Arial, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-weight: 700; font-variant: normal; vertical-align: baseline; white-space: pre-wrap;&quot;&gt;מחשב שרת מרכזי &lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(237, 237, 237)); font-family: Arial, sans-serif; font-size: 11pt; font-weight: 700; white-space: pre-wrap;&quot;&gt;Central Server&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;fontColor=#ffffff;strokeColor=light-dark(#006EAF,#000000);" vertex="1" parent="1">
+          <mxGeometry x="360" y="180" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-2" value="&lt;span id=&quot;docs-internal-guid-af0a74ea-7fff-8ab5-d190-02b0f5820d23&quot;&gt;&lt;span style=&quot;font-size: 11pt; font-family: Arial, sans-serif; color: rgb(0, 0, 0); background-color: transparent; font-weight: 700; font-variant: normal; vertical-align: baseline; white-space: pre-wrap;&quot;&gt;מחשב קצה (Agent) - NIC&lt;/span&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#0050ef, #0558ff);fontColor=#ffffff;strokeColor=light-dark(#001DBC, #ffffff);" vertex="1" parent="1">
+          <mxGeometry x="360" y="330" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-3" value="&lt;span style=&quot;font-family: Arial, sans-serif; font-size: 14.6667px; font-weight: 700; white-space: pre-wrap;&quot;&gt;מחשב קצה (Agent) - NIC&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#0050ef, #0558ff);fontColor=light-dark(#FFFFFF,#FFFFFF);strokeColor=light-dark(#001DBC, #ffffff);" vertex="1" parent="1">
+          <mxGeometry x="520" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-4" value="&lt;span style=&quot;font-family: Arial, sans-serif; font-size: 14.6667px; font-weight: 700; white-space: pre-wrap;&quot;&gt;מחשב קצה (Agent) - NIC&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#0050ef, #0558ff);fontColor=light-dark(#FFFFFF,#FFFFFF);strokeColor=light-dark(#001DBC, #ffffff);" vertex="1" parent="1">
+          <mxGeometry x="200" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-9" value="&lt;b&gt;תקשורת מוצפנת עם השרת&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;textShadow=1;" vertex="1" parent="1">
+          <mxGeometry x="350" y="270" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8BgL7pL5LaJh27u9AvMq-14" value="&lt;div&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot; face=&quot;Arial, sans-serif&quot;&gt;&lt;span style=&quot;font-size: 14.6667px; white-space-collapse: preserve;&quot;&gt;&lt;b style=&quot;&quot;&gt;ממשק ניהול&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot; face=&quot;Arial, sans-serif&quot;&gt;&lt;span style=&quot;font-size: 14.6667px; white-space-collapse: preserve;&quot;&gt;&lt;b style=&quot;&quot;&gt;GUI&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#1BA1E2,#3030C4);fontColor=#ffffff;strokeColor=light-dark(#006EAF,#000000);" vertex="1" parent="1">
+          <mxGeometry x="370" y="120" width="100" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

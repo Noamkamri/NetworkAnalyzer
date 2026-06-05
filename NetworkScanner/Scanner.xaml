@@ -465,7 +465,7 @@
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="B" Background="#991B1B" CornerRadius="5">
-                                            <TextBlock Text="Block Threat" Foreground="White" FontSize="13"
+                                            <TextBlock Text="Block Anomaly" Foreground="White" FontSize="13"
                                                        FontWeight="SemiBold"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>

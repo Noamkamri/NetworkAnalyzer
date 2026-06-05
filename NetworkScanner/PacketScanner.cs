@@ -58,7 +58,7 @@ namespace NetworkScanner
             StartProcessingThread();
 
             Thread floodPreventionThread =
-                new Thread(() => stats.PreventFloodAttacks())
+                new Thread(() => stats.PreventFloodAnomalies())
                 {
                     IsBackground = true
                 };
@@ -72,24 +72,29 @@ namespace NetworkScanner
 
         private void StartProcessingThread()
         {
+            // לולאה המייצרת ומפעילה את כמות תהליכוני העבודה שהוגדרה
             for (int i = 0; i < WorkerCount; i++)
             {
                 Task.Run(() =>
                 {
+                    // לולאה חכמה השולפת חבילות בצורה מאובטחת וממתינה אוטומטית אם התור ריק
                     foreach (var raw in PacketQueue.Queue.GetConsumingEnumerable())
                     {
                         try
                         {
+                            // שלב הפענוח והפירסור של שכבות התקשורת
                             var packet = Packet.ParsePacket(raw.LinkLayerType, raw.Data);
                             var info = BuildPacketInfo(packet, raw);
 
-                            // If this IP has been blocked, drop it silently
+                            // בדיקה מול רכיב החסימות הדינמי
                             if (stats.IsBlocked(info.SrcIP)) continue;
 
+                            // עדכון המונים, פילוח הסטטיסטיקות ובדיקת אנומליות ברשת
                             stats.UpdateFloodPreventionStats(packet, info);
                             stats.UpdateProtocolCount(in info);
                             HandleArp(packet);
 
+                            // הזרקת המידע המפוענח לממשק הגרפי במידה והפרוטוקול נתמך
                             if (info.Protocol != "UNSUPPORTED")
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
@@ -109,7 +114,10 @@ namespace NetworkScanner
 
         private void OnPacketArrival(object sender, PacketCapture e)
         {
+            // השגת החבילה הגולמית מהאירוע של כרטיס הרשת
             var raw = e.GetPacket();
+
+            // ניסיון הוספה מהיר לתור המקבילי. אם התור מלא, תודפס שגיאה
             if (!PacketQueue.Queue.TryAdd(raw))
                 Console.WriteLine("Queue full — packet dropped.");
         }
@@ -145,21 +153,24 @@ namespace NetworkScanner
                 packet.Extract<IcmpV6Packet>() != null)
                 protocol = "ICMP";
 
+            // בדיקה האם מדובר בחבילת TCP וחילוץ הנתונים וה-Payload שלה
             var tcp = packet.Extract<TcpPacket>();
             if (tcp != null)
             {
-                srcPort = tcp.SourcePort;
-                dstPort = tcp.DestinationPort;
-                protocol = DetectProtocol(tcp.PayloadData, srcPort, dstPort, "TCP");
+                srcPort = tcp.SourcePort;                              // שמירת פורט המקור
+                dstPort = tcp.DestinationPort;                         // שמירת פורט היעד
+                protocol = DetectProtocol(tcp.PayloadData, srcPort, dstPort, "TCP"); // העברת ה-Payload לפענוח
             }
 
+            // בדיקה האם מדובר בחבילת UDP וחילוץ הנתונים וה-Payload שלה
             var udp = packet.Extract<UdpPacket>();
             if (udp != null)
             {
-                srcPort = udp.SourcePort;
-                dstPort = udp.DestinationPort;
-                protocol = DetectProtocol(udp.PayloadData, srcPort, dstPort, "UDP");
+                srcPort = udp.SourcePort;                              // שמירת פורט המקור
+                dstPort = udp.DestinationPort;                         // שמירת פורט היעד
+                protocol = DetectProtocol(udp.PayloadData, srcPort, dstPort, "UDP"); // העברת ה-Payload לפענוח
 
+                // לוגיקה ייעודית עבור חבילות מסוג DNS
                 if (protocol == "DNS" && srcPort == 53 && udp.PayloadData.Length >= 2)
                 {
                     ushort transactionID = (ushort)((udp.PayloadData[0] << 8) | udp.PayloadData[1]);
@@ -167,15 +178,18 @@ namespace NetworkScanner
                 }
             }
 
+            // בדיקה האם הפרוטוקול שפוענח מותר ונתמך על ידי רשימת הסינון של המערכת
             if (!allowedProtocols.Contains(protocol))
                 protocol = "UNSUPPORTED";
 
+            // השגת חותמת הזמן וסידור אזור הזמן המקומי (Local Time)
             var ts = raw.Timeval.Date;
             if (ts.Kind == DateTimeKind.Unspecified)
                 ts = DateTime.SpecifyKind(ts, DateTimeKind.Utc).ToLocalTime();
             else
                 ts = ts.ToLocalTime();
 
+            // בנייה והחזרה של ישות המידע המלאה (PacketInfo) לצורך עדכון מונים והזרקה ל-UI
             return new PacketInfo
             {
                 Timestamp = ts,
@@ -195,9 +209,11 @@ namespace NetworkScanner
             if (payload == null || payload.Length == 0)
                 return "TCP";
 
+            // שלב אימות החתימה הדינמי: זיהוי פרוטוקול HTTPS לפי חתימת בתים בינארית של TLS
             if (payload.Length >= 3 && payload[0] == 0x16 && payload[1] == 0x03)
                 return "HTTPS";
 
+            // שלב אימות החתימה הדינמי: זיהוי פרוטוקול HTTP לפי מילות מפתח בבתים הראשונים
             if (payload.Length >= 4)
             {
                 string startStr = System.Text.Encoding.ASCII.GetString(payload, 0, 4).ToUpper();
@@ -206,6 +222,7 @@ namespace NetworkScanner
                     return "HTTP";
             }
 
+            // במידה ולא נמצאה חתימה ייחודית בבתים, סיווג הפרוטוקול יתבצע על פי מספרי פורטים נפוצים
             int port = (srcPort <= 1023) ? srcPort : dstPort;
             return port switch
             {
@@ -224,7 +241,7 @@ namespace NetworkScanner
                 device.StopCapture();
                 device.Close();
                 stats?.ClearBlockedIps();
-                ThreatBlocker.ClearAllBlocks();
+                AnomalyBlocker.ClearAllBlocks();
             }
         }
 
@@ -244,7 +261,7 @@ namespace NetworkScanner
 
             string existingMac = arpTable.GetOrAdd(ip, mac);
             if (existingMac != mac)
-                RaiseAttack("ARP Spoofing", ip, $"MAC changed from {existingMac} to {mac}", ip, 0);
+                RaiseAnomaly("ARP Spoofing", ip, $"MAC changed from {existingMac} to {mac}", ip, 0);
         }
 
         void HandleDns(ushort txId, string sourceIp, string sourceMac)
@@ -258,7 +275,7 @@ namespace NetworkScanner
                         if ((DateTime.Now - _lastDnsAlertTime).TotalSeconds > 4)
                         {
                             _lastDnsAlertTime = DateTime.Now;
-                            RaiseAttack("DNS Spoofing", sourceIp,
+                            RaiseAnomaly("DNS Spoofing", sourceIp,
                                 $"MAC conflict on transaction ID {txId:X4} — expected {firstMac}, got {sourceMac}.",
                                 sourceIp, 53);
                         }
@@ -277,12 +294,12 @@ namespace NetworkScanner
             }
         }
 
-        // All attack types funnel through here → Scanner overlay
-        private void RaiseAttack(string type, string target, string details, string ip = "", int port = 0)
+        // All anomaly types funnel through here → Scanner overlay
+        private void RaiseAnomaly(string type, string target, string details, string ip = "", int port = 0)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                uiPage?.RaiseAttack(type, target, details, ip, port);
+                uiPage?.RaiseAnomaly(type, target, details, ip, port);
             });
         }
     }

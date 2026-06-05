@@ -2,7 +2,7 @@
 
 namespace NetworkScanner
 {
-    class ThreatBlocker
+    class AnomalyBlocker
     {
         // Blocks a TCP socket (SYN flood, DNS spoofing)
         // Input: ip, port

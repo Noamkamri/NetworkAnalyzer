@@ -15,12 +15,5 @@ namespace NetworkScanner
         public static BlockingCollection<RawCapture> Queue =
             new BlockingCollection<RawCapture>(boundedCapacity: Capacity);
 
-        public static void TrimIfBacklogged()
-        {
-            if (Queue.Count <= HighWatermark) return;
-
-            // נזרוק ישנות עד שנרד ל-LowWatermark
-            while (Queue.Count > LowWatermark && Queue.TryTake(out _)) { }
-        }
     }
 }

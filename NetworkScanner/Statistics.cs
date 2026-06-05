@@ -18,7 +18,7 @@ namespace NetworkScanner
         private readonly Dictionary<string, SocketStats> _sockets = new();
         private readonly HashSet<string> _blockedIps = new();
 
-        // Reference to the Scanner page so we can call RaiseAttack on it
+        // Reference to the Scanner page so we can call RaiseAnomaly on it
         private Scanner _uiPage;
         public void SetUI(Scanner page) => _uiPage = page;
 
@@ -88,7 +88,7 @@ namespace NetworkScanner
             }
         }
 
-        public void PreventFloodAttacks()
+        public void PreventFloodAnomalies()
         {
             while (true)
             {
@@ -103,25 +103,25 @@ namespace NetworkScanner
                         if (socket.SYNCount > MAX_SYN_PER_SECOND && !_blockedIps.Contains(socket.Ip))
                         {
                             _blockedIps.Add(socket.Ip);
-                            _uiPage?.RaiseAttack(
+                            _uiPage?.RaiseAnomaly(
                                 "SYN Flood Detected",
                                 $"Source: {socket.Ip}:{socket.Port}",
                                 $"{socket.SYNCount} SYN packets/sec from {socket.Ip} on port {socket.Port} — threshold is {MAX_SYN_PER_SECOND}/sec.",
                                 socket.Ip, socket.Port
                             );
-                            ThreatBlocker.Block(socket.Ip, socket.Port);
+                            AnomalyBlocker.Block(socket.Ip, socket.Port);
                         }
 
                         if (socket.ICMPCount > MAX_ICMP_PER_SECOND && !_blockedIps.Contains(socket.Ip))
                         {
                             _blockedIps.Add(socket.Ip);
-                            _uiPage?.RaiseAttack(
+                            _uiPage?.RaiseAnomaly(
                                 "ICMP Flood Detected",
                                 $"Source: {socket.Ip}",
                                 $"{socket.ICMPCount} ICMP packets/sec from {socket.Ip} — threshold is {MAX_ICMP_PER_SECOND}/sec.",
                                 socket.Ip, 0
                             );
-                            ThreatBlocker.BlockIcmp(socket.Ip);
+                            AnomalyBlocker.BlockIcmp(socket.Ip);
                         }
 
                         socket.SYNCount = 0;

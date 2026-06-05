@@ -40,7 +40,7 @@ namespace NetworkScanner
         private string _baselineBssid = "";
         private string _baselineSsid = "";
 
-        // Last attacker info
+        // Last anomalyer info
         private string _alertIp = "";
         private int _alertPort = 0;
         private string _alertType = "";
@@ -179,7 +179,7 @@ namespace NetworkScanner
 
                 if (currentSsid == _baselineSsid && currentMac != _baselineBssid)
                 {
-                    RaiseAttack("Evil Twin Detected", "Wi-Fi Integrity",
+                    RaiseAnomaly("Evil Twin Detected", "Wi-Fi Integrity",
                         $"You are still on '{currentSsid}', but the hardware identity changed from {_baselineBssid} to {currentMac}!");
                 }
             };
@@ -190,7 +190,7 @@ namespace NetworkScanner
         // INLINE SECURITY ALERT
         // ─────────────────────────────────────────────────
 
-        public void RaiseAttack(string type, string target, string details, string ip = "", int port = 0)
+        public void RaiseAnomaly(string type, string target, string details, string ip = "", int port = 0)
         {
             // Fire and forget the network transmission
             Task.Run(() => SendMessageToServer($"ALERT|{type}|{target} - {details}"));
@@ -201,9 +201,9 @@ namespace NetworkScanner
 
                 _alertIp = ip;
                 _alertPort = port;
-                _alertType = type;
+                _alertType = "Anomaly Detected";
 
-                AlertTypeLabel.Text = type;
+                AlertTypeLabel.Text = "Anomaly Detected";
                 AlertTargetLabel.Text = target;
                 AlertDetailsLabel.Text = details;
                 AlertTimeLabel.Text = DateTime.Now.ToString("HH:mm:ss   dd MMM yyyy");
@@ -275,11 +275,11 @@ namespace NetworkScanner
             if (!string.IsNullOrEmpty(_alertIp))
             {
                 if (_alertType.Contains("ICMP"))
-                    ThreatBlocker.BlockIcmp(_alertIp);
+                    AnomalyBlocker.BlockIcmp(_alertIp);
                 else if (_alertType.Contains("ARP") || _alertType.Contains("Evil Twin"))
-                    ThreatBlocker.BlockIp(_alertIp);
+                    AnomalyBlocker.BlockIp(_alertIp);
                 else
-                    ThreatBlocker.Block(_alertIp, _alertPort);
+                    AnomalyBlocker.Block(_alertIp, _alertPort);
             }
 
             AlertOverlay.Visibility = Visibility.Collapsed;

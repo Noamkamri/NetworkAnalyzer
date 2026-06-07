@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" pages="2">
   <diagram name="Page-1" id="qZ7XV4MUS3rLwtqJH2Rk">
-    <mxGraphModel dx="2571" dy="1376" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2968" dy="946" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -149,6 +149,307 @@
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-66" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=light-dark(#3700CC,#000000);fillColor=light-dark(#6A00FF,#FFA51F);align=center;verticalAlign=middle;rounded=1;fontColor=#FFFFFF;fontStyle=1" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;&lt;span&gt;תקשורת מאובטחת&lt;/span&gt;&lt;/font&gt;" vertex="1">
           <mxGeometry height="50" width="200" x="1327" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="69H8ZttxyOQc8Sx1NIhs-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;p&gt;&lt;font style=&quot;font-size: 52px;&quot; face=&quot;rubik&quot;&gt;&lt;b&gt;תרשים זרימה&lt;/b&gt;&lt;/font&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="120" width="330" x="-370" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-1" parent="1" style="swimlane;startSize=30;strokeWidth=2;dashed=1;fontStyle=1;fontSize=25;fillColor=#f8cecc;strokeColor=#b85450;" value="צד לקוח - NetworkScanner" vertex="1">
+          <mxGeometry height="1200" width="1030" x="-910" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-2" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;App&lt;/b&gt;&lt;hr/&gt;- OnStartup()&lt;br/&gt;- IsRunningAsAdmin() : bool" vertex="1">
+          <mxGeometry height="70" width="220" x="320" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-3" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ChooseDevice&lt;/b&gt; : Page&lt;hr/&gt;- _selectedCaptureDevice : ICaptureDevice&lt;br/&gt;- _interfaceRefreshTimer : DispatcherTimer&lt;hr/&gt;+ LoadCaptureInterfaces()&lt;br/&gt;+ StartScan_Click()&lt;br/&gt;+ OpenPcap_Click()&lt;br/&gt;- RefreshInterfaces()" vertex="1">
+          <mxGeometry height="140" width="270" x="320" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-4" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;CaptureInterfaceItem&lt;/b&gt;&lt;hr/&gt;+ CaptureDevice : ICaptureDevice&lt;br/&gt;+ InterfaceType : string&lt;br/&gt;+ Description : string&lt;br/&gt;+ IconPath : string" vertex="1">
+          <mxGeometry height="100" width="270" x="690" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-5" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#9673a6;fillColor=#e1d5e7;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;Scanner&lt;/b&gt; : Page&lt;hr/&gt;- scanner : PacketScanner&lt;br/&gt;- _pendingPackets : ConcurrentQueue&amp;lt;PacketInfo&amp;gt;&lt;br/&gt;- _serverClient : TcpClient&lt;br/&gt;- _rsaClient : RSACryptoServiceProvider&lt;br/&gt;- _baselineBssid : string&lt;br/&gt;- _uiFlushTimer : DispatcherTimer&lt;hr/&gt;+ AddPacket(info)&lt;br/&gt;+ RaiseAnomaly(type, target, details, ip, port)&lt;br/&gt;+ ConnectToCentralServer(ip, port)&lt;br/&gt;- SendMessageToServer(message)&lt;br/&gt;- StartEvilTwinDefense()&lt;br/&gt;- FlushPendingPackets()" vertex="1">
+          <mxGeometry height="230" width="290" x="330" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-48" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="y5Ji89JM0JoF8ThAtf1u-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-6" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#9673a6;fillColor=#e1d5e7;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;PacketScanner&lt;/b&gt;&lt;hr/&gt;- device : ICaptureDevice&lt;br/&gt;- uiPage : Scanner&lt;br/&gt;- stats : Statistics&lt;br/&gt;- arpTable : ConcurrentDictionary&amp;lt;string,string&amp;gt;&lt;br/&gt;- dnsMacTracker : ConcurrentDictionary&amp;lt;ushort,string&amp;gt;&lt;hr/&gt;+ Start(dev)&lt;br/&gt;+ Stop()&lt;br/&gt;+ GetProtocolCountSnapshot() : ProtocolCount&lt;br/&gt;- StartProcessingThread()&lt;br/&gt;- OnPacketArrival(sender, e)&lt;br/&gt;- BuildPacketInfo(packet, raw) : PacketInfo&lt;br/&gt;- DetectProtocol(payload, srcPort, dstPort, default) : string&lt;br/&gt;- HandleArp(packet)&lt;br/&gt;- HandleDns(txId, srcIp, srcMac)&lt;br/&gt;- RaiseAnomaly(type, target, details, ip, port)" vertex="1">
+          <mxGeometry height="270" width="290" x="330" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-7" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&amp;lt;&amp;lt;struct&amp;gt;&amp;gt;&lt;br/&gt;&lt;b&gt;PacketInfo&lt;/b&gt;&lt;hr/&gt;+ Timestamp : DateTime&lt;br/&gt;+ SrcIP : string&lt;br/&gt;+ DstIP : string&lt;br/&gt;+ SrcPort : int&lt;br/&gt;+ DstPort : int&lt;br/&gt;+ Protocol : string&lt;br/&gt;+ MacSrc : string&lt;br/&gt;+ MacDst : string&lt;br/&gt;+ Length : int&lt;br/&gt;+ SrcEndpoint : string&lt;br/&gt;+ DstEndpoint : string" vertex="1">
+          <mxGeometry height="220" width="290" x="710" y="790" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-14" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-2" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="y5Ji89JM0JoF8ThAtf1u-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-15" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-14" style="edgeLabel;fontSize=13;" value="navigates to" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-22" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-16" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-3" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="y5Ji89JM0JoF8ThAtf1u-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-17" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-16" style="edgeLabel;fontSize=13;" value="creates + navigates" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-55" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-18" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-3" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="y5Ji89JM0JoF8ThAtf1u-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-19" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-18" style="edgeLabel;fontSize=13;" value="contains list of" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-40" y="-20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-20" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-5" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="y5Ji89JM0JoF8ThAtf1u-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-21" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-20" style="edgeLabel;fontSize=13;" value="owns" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-20" y="-20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-28" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-6" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;rounded=0;curved=0;" target="y5Ji89JM0JoF8ThAtf1u-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-29" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-28" style="edgeLabel;fontSize=13;" value="creates" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-13" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&amp;lt;&amp;lt;static&amp;gt;&amp;gt;&lt;br/&gt;&lt;b&gt;PcapHandler&lt;/b&gt;&lt;hr/&gt;+ SaveToPcap(filePath, packets)&lt;br/&gt;+ LoadFromPcap(filePath) : List&amp;lt;PacketInfo&amp;gt;&lt;br/&gt;- WriteGlobalHeader(writer)&lt;br/&gt;- WritePacketHeader(writer, ts, len)&lt;br/&gt;- BuildFrame(packet) : byte[]&lt;br/&gt;- ValidateAndSkipGlobalHeader(reader)&lt;br/&gt;- ReadPacketHeader(reader) : (DateTime, int)&lt;br/&gt;- ParseFrame(frame, timestamp) : PacketInfo?" vertex="1">
+          <mxGeometry height="180" width="220" x="710" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-42" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="y5Ji89JM0JoF8ThAtf1u-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-30" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;" target="y5Ji89JM0JoF8ThAtf1u-10">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="600" y="1095" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-31" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-30" style="edgeLabel;fontSize=13;" value="calls&#xa;" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-16" y="-30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-10" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&amp;lt;&amp;lt;static&amp;gt;&amp;gt;&lt;br/&gt;&lt;b&gt;AnomalyBlocker&lt;/b&gt;&lt;hr/&gt;+ Block(ip : string, port : int)&lt;br/&gt;+ BlockIcmp(ip : string)&lt;br/&gt;+ BlockIp(ip : string)&lt;br/&gt;+ ClearAllBlocks()&lt;br/&gt;- RunNetsh(arguments : string)" vertex="1">
+          <mxGeometry height="130" width="290" x="710" y="1050" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-22" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-5" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;strokeWidth=3;" target="y5Ji89JM0JoF8ThAtf1u-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1150" y="505" />
+              <mxPoint x="1150" y="1115" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-23" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-22" style="edgeLabel;fontSize=13;" value="uses&#xa;" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-10" y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-9" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#d79b00;fillColor=#ffe6cc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;Statistics&lt;/b&gt;&lt;hr/&gt;- _protocolCount : ProtocolCount&lt;br/&gt;- _protocolLock : object&lt;br/&gt;- _sockets : Dictionary&amp;lt;string, SocketStats&amp;gt;&lt;br/&gt;- _blockedIps : HashSet&amp;lt;string&amp;gt;&lt;br/&gt;- _uiPage : Scanner&lt;hr/&gt;+ SetUI(page)&lt;br/&gt;+ UpdateProtocolCount(in info)&lt;br/&gt;+ UpdateFloodPreventionStats(packet, info)&lt;br/&gt;+ PreventFloodAnomalies()&lt;br/&gt;+ IsBlocked(ip) : bool&lt;br/&gt;+ ClearBlockedIps()&lt;br/&gt;+ GetProtocolCountSnapshot() : ProtocolCount" vertex="1">
+          <mxGeometry height="230" width="290" x="310" y="960" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-8" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&amp;lt;&amp;lt;static&amp;gt;&amp;gt;&lt;br/&gt;&lt;b&gt;PacketQueue&lt;/b&gt;&lt;hr/&gt;+ Queue : BlockingCollection&amp;lt;RawCapture&amp;gt;&lt;br/&gt;+ Capacity : int = 6000&lt;br/&gt;+ HighWatermark : int = 5000&lt;br/&gt;+ LowWatermark : int = 2000" vertex="1">
+          <mxGeometry height="110" width="260" x="20" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-26" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-6" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;exitX=0;exitY=0.75;exitDx=0;exitDy=0;" target="y5Ji89JM0JoF8ThAtf1u-8">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="880" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-27" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-26" style="edgeLabel;fontSize=13;" value="uses" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-10" y="-34" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-47" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="y5Ji89JM0JoF8ThAtf1u-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-11" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ProtocolBarsVM&lt;/b&gt; : ObservableObject&lt;hr/&gt;- _snapshotProvider : Func&amp;lt;ProtocolCount&amp;gt;&lt;br/&gt;- _data : ProtocolInfo[]&lt;br/&gt;+ Series : ISeries[]&lt;br/&gt;+ XAxes : Axis[]&lt;br/&gt;+ YAxes : Axis[]&lt;br/&gt;+ IsMonitoring : bool&lt;hr/&gt;- StartMonitoring() : Task&lt;br/&gt;- UpdateValue(name, newValue)&lt;br/&gt;- FetchEmpty() : ProtocolInfo[]" vertex="1">
+          <mxGeometry height="190" width="220" x="40" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-12" parent="y5Ji89JM0JoF8ThAtf1u-1" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ProtocolInfo&lt;/b&gt; : ObservableValue&lt;hr/&gt;+ Name : string&lt;br/&gt;+ Paint : SolidColorPaint" vertex="1">
+          <mxGeometry height="70" width="220" x="40" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-46" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" source="y5Ji89JM0JoF8ThAtf1u-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="y5Ji89JM0JoF8ThAtf1u-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-40" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-1" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;strokeColor=#FF6600;fontColor=#FF6600;strokeWidth=4;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1020" y="485" />
+              <mxPoint x="1020" y="180" />
+            </Array>
+            <mxPoint x="600" y="485" as="sourcePoint" />
+            <mxPoint x="1350.0769230769233" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-41" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-40" style="edgeLabel;fontSize=15;fontColor=#FF6600;fontStyle=1;" value="TCP/RSA encrypted" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-200" y="73" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-32" parent="1" style="swimlane;startSize=30;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;dashed=1;fontStyle=1;fontSize=25;" value="צד שרת — ScannerServer" vertex="1">
+          <mxGeometry height="600" width="400" x="260" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-33" parent="y5Ji89JM0JoF8ThAtf1u-32" style="text;html=1;strokeColor=#9673a6;fillColor=#e1d5e7;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;MainWindow&lt;/b&gt; : Window&lt;hr/&gt;- _agentMap : ConcurrentDictionary&amp;lt;string, ConnectedAgent&amp;gt;&lt;br/&gt;+ Agents : ObservableCollection&amp;lt;ConnectedAgent&amp;gt;&lt;br/&gt;- _rsaServer : RSACryptoServiceProvider&lt;hr/&gt;- StartListening() : Task&lt;br/&gt;- HandleAgentMessages(client, agent) : Task&lt;br/&gt;- ProcessMessage(agent, message)" vertex="1">
+          <mxGeometry height="140" width="340" x="30" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-34" parent="y5Ji89JM0JoF8ThAtf1u-32" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ConnectedAgent&lt;/b&gt; : INotifyPropertyChanged&lt;hr/&gt;+ IP : string&lt;br/&gt;+ TotalPackets : int&lt;br/&gt;+ Status : string&lt;br/&gt;+ AgentAlerts : ObservableCollection&amp;lt;string&amp;gt;&lt;br/&gt;+ Protocols : ObservableCollection&amp;lt;ProtocolStat&amp;gt;&lt;hr/&gt;# OnPropertyChanged(name)" vertex="1">
+          <mxGeometry height="160" width="340" x="30" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-35" parent="y5Ji89JM0JoF8ThAtf1u-32" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ProtocolStat&lt;/b&gt; : INotifyPropertyChanged&lt;hr/&gt;+ Name : string&lt;br/&gt;+ Count : int&lt;hr/&gt;# OnPropertyChanged(name)" vertex="1">
+          <mxGeometry height="100" width="340" x="30" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-36" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-32" source="y5Ji89JM0JoF8ThAtf1u-33" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="y5Ji89JM0JoF8ThAtf1u-34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-37" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-36" style="edgeLabel;fontSize=13;" value="manages list of" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-50" y="-13" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-38" edge="1" parent="y5Ji89JM0JoF8ThAtf1u-32" source="y5Ji89JM0JoF8ThAtf1u-34" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="y5Ji89JM0JoF8ThAtf1u-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="y5Ji89JM0JoF8ThAtf1u-39" connectable="0" parent="y5Ji89JM0JoF8ThAtf1u-38" style="edgeLabel;fontSize=13;" value="contains list of" vertex="1">
+          <mxGeometry relative="0.5" as="geometry">
+            <mxPoint x="-40" y="-15" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="x9r1-xXtbF3BOBC-zoep" name="Page-2">
+    <mxGraphModel dx="2020" dy="1081" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="client_container" parent="1" style="swimlane;startSize=30;fillColor=none;strokeColor=#6c8ebf;strokeWidth=2;dashed=1;fontStyle=1;fontSize=13;" value="צד לקוח — NetworkScanner" vertex="1">
+          <mxGeometry height="960" width="780" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="App" parent="client_container" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;App&lt;/b&gt;&lt;hr/&gt;- OnStartup()&lt;br/&gt;- IsRunningAsAdmin() : bool" vertex="1">
+          <mxGeometry height="70" width="220" x="30" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ChooseDevice" parent="client_container" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ChooseDevice&lt;/b&gt; : Page&lt;hr/&gt;- _selectedCaptureDevice : ICaptureDevice&lt;br/&gt;- _interfaceRefreshTimer : DispatcherTimer&lt;hr/&gt;+ LoadCaptureInterfaces()&lt;br/&gt;+ StartScan_Click()&lt;br/&gt;+ OpenPcap_Click()&lt;br/&gt;- RefreshInterfaces()" vertex="1">
+          <mxGeometry height="140" width="270" x="30" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="CaptureInterfaceItem" parent="client_container" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;CaptureInterfaceItem&lt;/b&gt;&lt;hr/&gt;+ CaptureDevice : ICaptureDevice&lt;br/&gt;+ InterfaceType : string&lt;br/&gt;+ Description : string&lt;br/&gt;+ IconPath : string" vertex="1">
+          <mxGeometry height="100" width="270" x="30" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="Scanner" parent="client_container" style="text;html=1;strokeColor=#9673a6;fillColor=#e1d5e7;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;Scanner&lt;/b&gt; : Page&lt;hr/&gt;- scanner : PacketScanner&lt;br/&gt;- _pendingPackets : ConcurrentQueue&amp;lt;PacketInfo&amp;gt;&lt;br/&gt;- _serverClient : TcpClient&lt;br/&gt;- _rsaClient : RSACryptoServiceProvider&lt;br/&gt;- _baselineBssid : string&lt;br/&gt;- _uiFlushTimer : DispatcherTimer&lt;hr/&gt;+ AddPacket(info)&lt;br/&gt;+ RaiseAnomaly(type, target, details, ip, port)&lt;br/&gt;+ ConnectToCentralServer(ip, port)&lt;br/&gt;- SendMessageToServer(message)&lt;br/&gt;- StartEvilTwinDefense()&lt;br/&gt;- FlushPendingPackets()" vertex="1">
+          <mxGeometry height="230" width="290" x="370" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="PacketScanner" parent="client_container" style="text;html=1;strokeColor=#9673a6;fillColor=#e1d5e7;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;PacketScanner&lt;/b&gt;&lt;hr/&gt;- device : ICaptureDevice&lt;br/&gt;- uiPage : Scanner&lt;br/&gt;- stats : Statistics&lt;br/&gt;- arpTable : ConcurrentDictionary&amp;lt;string,string&amp;gt;&lt;br/&gt;- dnsMacTracker : ConcurrentDictionary&amp;lt;ushort,string&amp;gt;&lt;hr/&gt;+ Start(dev)&lt;br/&gt;+ Stop()&lt;br/&gt;+ GetProtocolCountSnapshot() : ProtocolCount&lt;br/&gt;- StartProcessingThread()&lt;br/&gt;- OnPacketArrival(sender, e)&lt;br/&gt;- BuildPacketInfo(packet, raw) : PacketInfo&lt;br/&gt;- DetectProtocol(payload, srcPort, dstPort, default) : string&lt;br/&gt;- HandleArp(packet)&lt;br/&gt;- HandleDns(txId, srcIp, srcMac)&lt;br/&gt;- RaiseAnomaly(type, target, details, ip, port)" vertex="1">
+          <mxGeometry height="260" width="290" x="370" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="PacketInfo" parent="client_container" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&amp;lt;&amp;lt;struct&amp;gt;&amp;gt;&lt;br/&gt;&lt;b&gt;PacketInfo&lt;/b&gt;&lt;hr/&gt;+ Timestamp : DateTime&lt;br/&gt;+ SrcIP : string&lt;br/&gt;+ DstIP : string&lt;br/&gt;+ SrcPort : int&lt;br/&gt;+ DstPort : int&lt;br/&gt;+ Protocol : string&lt;br/&gt;+ MacSrc : string&lt;br/&gt;+ MacDst : string&lt;br/&gt;+ Length : int&lt;br/&gt;+ SrcEndpoint : string&lt;br/&gt;+ DstEndpoint : string" vertex="1">
+          <mxGeometry height="130" width="290" x="370" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="PacketQueue" parent="client_container" style="text;html=1;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&amp;lt;&amp;lt;static&amp;gt;&amp;gt;&lt;br/&gt;&lt;b&gt;PacketQueue&lt;/b&gt;&lt;hr/&gt;+ Queue : BlockingCollection&amp;lt;RawCapture&amp;gt;&lt;br/&gt;+ Capacity : int = 6000&lt;br/&gt;+ HighWatermark : int = 5000&lt;br/&gt;+ LowWatermark : int = 2000" vertex="1">
+          <mxGeometry height="100" width="280" x="30" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="Statistics" parent="client_container" style="text;html=1;strokeColor=#d79b00;fillColor=#ffe6cc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;Statistics&lt;/b&gt;&lt;hr/&gt;- _protocolCount : ProtocolCount&lt;br/&gt;- _protocolLock : object&lt;br/&gt;- _sockets : Dictionary&amp;lt;string, SocketStats&amp;gt;&lt;br/&gt;- _blockedIps : HashSet&amp;lt;string&amp;gt;&lt;br/&gt;- _uiPage : Scanner&lt;hr/&gt;+ SetUI(page)&lt;br/&gt;+ UpdateProtocolCount(in info)&lt;br/&gt;+ UpdateFloodPreventionStats(packet, info)&lt;br/&gt;+ PreventFloodAnomalies()&lt;br/&gt;+ IsBlocked(ip) : bool&lt;br/&gt;+ ClearBlockedIps()&lt;br/&gt;+ GetProtocolCountSnapshot() : ProtocolCount" vertex="1">
+          <mxGeometry height="200" width="290" x="30" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="AnomalyBlocker" parent="client_container" style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&amp;lt;&amp;lt;static&amp;gt;&amp;gt;&lt;br/&gt;&lt;b&gt;AnomalyBlocker&lt;/b&gt;&lt;hr/&gt;+ Block(ip : string, port : int)&lt;br/&gt;+ BlockIcmp(ip : string)&lt;br/&gt;+ BlockIp(ip : string)&lt;br/&gt;+ ClearAllBlocks()&lt;br/&gt;- RunNetsh(arguments : string)" vertex="1">
+          <mxGeometry height="110" width="290" x="30" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="ProtocolBarsVM" parent="client_container" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ProtocolBarsVM&lt;/b&gt; : ObservableObject&lt;hr/&gt;- _snapshotProvider : Func&amp;lt;ProtocolCount&amp;gt;&lt;br/&gt;- _data : ProtocolInfo[]&lt;br/&gt;+ Series : ISeries[]&lt;br/&gt;+ XAxes : Axis[]&lt;br/&gt;+ YAxes : Axis[]&lt;br/&gt;+ IsMonitoring : bool&lt;hr/&gt;- StartMonitoring() : Task&lt;br/&gt;- UpdateValue(name, newValue)&lt;br/&gt;- FetchEmpty() : ProtocolInfo[]" vertex="1">
+          <mxGeometry height="190" width="220" x="530" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="ProtocolInfo" parent="client_container" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ProtocolInfo&lt;/b&gt; : ObservableValue&lt;hr/&gt;+ Name : string&lt;br/&gt;+ Paint : SolidColorPaint" vertex="1">
+          <mxGeometry height="80" width="220" x="530" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="PcapHandler" parent="client_container" style="text;html=1;strokeColor=#d6b656;fillColor=#fff2cc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&amp;lt;&amp;lt;static&amp;gt;&amp;gt;&lt;br/&gt;&lt;b&gt;PcapHandler&lt;/b&gt;&lt;hr/&gt;+ SaveToPcap(filePath, packets)&lt;br/&gt;+ LoadFromPcap(filePath) : List&amp;lt;PacketInfo&amp;gt;&lt;br/&gt;- WriteGlobalHeader(writer)&lt;br/&gt;- WritePacketHeader(writer, ts, len)&lt;br/&gt;- BuildFrame(packet) : byte[]&lt;br/&gt;- ValidateAndSkipGlobalHeader(reader)&lt;br/&gt;- ReadPacketHeader(reader) : (DateTime, int)&lt;br/&gt;- ParseFrame(frame, timestamp) : PacketInfo?" vertex="1">
+          <mxGeometry height="190" width="220" x="530" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="client_container" source="App" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="ChooseDevice">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e1l" connectable="0" parent="e1" style="edgeLabel;fontSize=10;" value="navigates to" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="client_container" source="ChooseDevice" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="Scanner">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2l" connectable="0" parent="e2" style="edgeLabel;fontSize=10;" value="creates + navigates" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="client_container" source="ChooseDevice" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="CaptureInterfaceItem">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3l" connectable="0" parent="e3" style="edgeLabel;fontSize=10;" value="contains list of" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="client_container" source="Scanner" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="PacketScanner">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4l" connectable="0" parent="e4" style="edgeLabel;fontSize=10;" value="owns" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="client_container" source="Scanner" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;" target="AnomalyBlocker">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5l" connectable="0" parent="e5" style="edgeLabel;fontSize=10;" value="«uses»" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="client_container" source="PacketScanner" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="Statistics">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6l" connectable="0" parent="e6" style="edgeLabel;fontSize=10;" value="owns" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="client_container" source="PacketScanner" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;" target="PacketQueue">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7l" connectable="0" parent="e7" style="edgeLabel;fontSize=10;" value="«uses»" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="client_container" source="PacketScanner" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="PacketInfo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8l" connectable="0" parent="e8" style="edgeLabel;fontSize=10;" value="creates" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="client_container" source="Statistics" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;" target="AnomalyBlocker">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9l" connectable="0" parent="e9" style="edgeLabel;fontSize=10;" value="«calls»" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="server_container" parent="1" style="swimlane;startSize=30;fillColor=none;strokeColor=#82b366;strokeWidth=2;dashed=1;fontStyle=1;fontSize=13;" value="צד שרת — ScannerServer" vertex="1">
+          <mxGeometry height="580" width="400" x="840" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="MainWindowServer" parent="server_container" style="text;html=1;strokeColor=#9673a6;fillColor=#e1d5e7;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;MainWindow&lt;/b&gt; : Window&lt;hr/&gt;- _agentMap : ConcurrentDictionary&amp;lt;string, ConnectedAgent&amp;gt;&lt;br/&gt;+ Agents : ObservableCollection&amp;lt;ConnectedAgent&amp;gt;&lt;br/&gt;- _rsaServer : RSACryptoServiceProvider&lt;hr/&gt;- StartListening() : Task&lt;br/&gt;- HandleAgentMessages(client, agent) : Task&lt;br/&gt;- ProcessMessage(agent, message)" vertex="1">
+          <mxGeometry height="160" width="340" x="30" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ConnectedAgent" parent="server_container" style="text;html=1;strokeColor=#6c8ebf;fillColor=#dae8fc;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ConnectedAgent&lt;/b&gt; : INotifyPropertyChanged&lt;hr/&gt;+ IP : string&lt;br/&gt;+ TotalPackets : int&lt;br/&gt;+ Status : string&lt;br/&gt;+ AgentAlerts : ObservableCollection&amp;lt;string&amp;gt;&lt;br/&gt;+ Protocols : ObservableCollection&amp;lt;ProtocolStat&amp;gt;&lt;hr/&gt;# OnPropertyChanged(name)" vertex="1">
+          <mxGeometry height="160" width="340" x="30" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="ProtocolStat" parent="server_container" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=left;verticalAlign=top;spacingLeft=6;overflow=hidden;fontSize=12;" value="&lt;b&gt;ProtocolStat&lt;/b&gt; : INotifyPropertyChanged&lt;hr/&gt;+ Name : string&lt;br/&gt;+ Count : int&lt;hr/&gt;# OnPropertyChanged(name)" vertex="1">
+          <mxGeometry height="60" width="340" x="30" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="server_container" source="MainWindowServer" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="ConnectedAgent">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10l" connectable="0" parent="e10" style="edgeLabel;fontSize=10;" value="manages list of" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="server_container" source="ConnectedAgent" style="edgeStyle=orthogonalEdgeStyle;endArrow=open;endFill=0;" target="ProtocolStat">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11l" connectable="0" parent="e11" style="edgeLabel;fontSize=10;" value="contains list of" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="Scanner" style="edgeStyle=orthogonalEdgeStyle;dashed=1;endArrow=open;endFill=0;strokeColor=#FF6600;fontColor=#FF6600;" target="MainWindowServer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12l" connectable="0" parent="e12" style="edgeLabel;fontSize=11;fontColor=#FF6600;fontStyle=1;" value="TCP/RSA encrypted" vertex="1">
+          <mxGeometry relative="0.5" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36" pages="2">
   <diagram name="Page-1" id="qZ7XV4MUS3rLwtqJH2Rk">
-    <mxGraphModel dx="3771" dy="1376" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="5240" dy="2163" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -10,10 +10,10 @@
         <mxCell id="8BgL7pL5LaJh27u9AvMq-7" edge="1" parent="1" source="8BgL7pL5LaJh27u9AvMq-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;textDirection=rtl;fontStyle=1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="420" y="230" />
+              <mxPoint x="640" y="220" />
             </Array>
-            <mxPoint x="430" y="320" as="sourcePoint" />
-            <mxPoint x="430" y="230" as="targetPoint" />
+            <mxPoint x="650" y="310" as="sourcePoint" />
+            <mxPoint x="650" y="220" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="8BgL7pL5LaJh27u9AvMq-8" edge="1" parent="1" source="8BgL7pL5LaJh27u9AvMq-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;textDirection=rtl;fontStyle=1" target="8BgL7pL5LaJh27u9AvMq-1">
@@ -23,37 +23,37 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="8BgL7pL5LaJh27u9AvMq-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;textDirection=rtl;fontStyle=1;" value="&lt;span id=&quot;docs-internal-guid-43ff6b61-7fff-41c6-71e0-c006050dde60&quot;&gt;&lt;span style=&quot;font-size: 11pt; font-family: Arial, sans-serif; background-color: transparent; font-variant: normal; vertical-align: baseline; white-space: pre-wrap;&quot;&gt;מחשב שרת מרכזי &lt;/span&gt;&lt;/span&gt;&lt;span style=&quot;background-color: transparent; font-family: Arial, sans-serif; font-size: 11pt; white-space: pre-wrap;&quot;&gt;Central Server&lt;/span&gt;" vertex="1">
-          <mxGeometry height="60" width="120" x="360" y="180" as="geometry" />
+          <mxGeometry height="60" width="120" x="580" y="170" as="geometry" />
         </mxCell>
         <mxCell id="8BgL7pL5LaJh27u9AvMq-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#0050ef, #0558ff);fontColor=#ffffff;strokeColor=light-dark(#001DBC, #ffffff);textDirection=rtl;fontStyle=1" value="&lt;span id=&quot;docs-internal-guid-af0a74ea-7fff-8ab5-d190-02b0f5820d23&quot;&gt;&lt;span style=&quot;font-size: 11pt; font-family: Arial, sans-serif; background-color: transparent; font-variant: normal; vertical-align: baseline; white-space: pre-wrap;&quot;&gt;&lt;font style=&quot;color: rgb(255, 255, 255);&quot;&gt;מחשב קצה (Agent) - NIC&lt;/font&gt;&lt;/span&gt;&lt;/span&gt;" vertex="1">
-          <mxGeometry height="60" width="120" x="360" y="330" as="geometry" />
+          <mxGeometry height="60" width="120" x="580" y="320" as="geometry" />
         </mxCell>
         <mxCell id="8BgL7pL5LaJh27u9AvMq-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#0050ef, #0558ff);fontColor=light-dark(#FFFFFF,#FFFFFF);strokeColor=light-dark(#001DBC, #ffffff);textDirection=rtl;fontStyle=1" value="&lt;span style=&quot;font-family: Arial, sans-serif; font-size: 14.6667px; white-space: pre-wrap;&quot;&gt;מחשב קצה (Agent) - NIC&lt;/span&gt;" vertex="1">
-          <mxGeometry height="60" width="120" x="520" y="300" as="geometry" />
+          <mxGeometry height="60" width="120" x="740" y="290" as="geometry" />
         </mxCell>
         <mxCell id="8BgL7pL5LaJh27u9AvMq-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#0050ef, #0558ff);fontColor=light-dark(#FFFFFF,#FFFFFF);strokeColor=light-dark(#001DBC, #ffffff);textDirection=rtl;fontStyle=1" value="&lt;span style=&quot;font-family: Arial, sans-serif; font-size: 14.6667px; white-space: pre-wrap;&quot;&gt;מחשב קצה (Agent) - NIC&lt;/span&gt;" vertex="1">
-          <mxGeometry height="60" width="120" x="200" y="300" as="geometry" />
+          <mxGeometry height="60" width="120" x="420" y="290" as="geometry" />
         </mxCell>
         <mxCell id="8BgL7pL5LaJh27u9AvMq-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;textShadow=1;textDirection=rtl;fontStyle=1" value="&lt;span&gt;תקשורת מוצפנת עם השרת&lt;/span&gt;" vertex="1">
-          <mxGeometry height="30" width="140" x="350" y="270" as="geometry" />
+          <mxGeometry height="30" width="140" x="570" y="260" as="geometry" />
         </mxCell>
         <mxCell id="8BgL7pL5LaJh27u9AvMq-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;textDirection=rtl;fontStyle=1;" value="&lt;div&gt;&lt;font face=&quot;Arial, sans-serif&quot; style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 14.6667px; white-space-collapse: preserve;&quot;&gt;&lt;span style=&quot;&quot;&gt;ממשק ניהול&lt;/span&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font face=&quot;Arial, sans-serif&quot; style=&quot;&quot;&gt;&lt;span style=&quot;font-size: 14.6667px; white-space-collapse: preserve;&quot;&gt;&lt;span style=&quot;&quot;&gt;GUI&lt;/span&gt;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
-          <mxGeometry height="40" width="100" x="370" y="120" as="geometry" />
+          <mxGeometry height="40" width="100" x="590" y="110" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-2" parent="1" style="whiteSpace=wrap;strokeWidth=3;textDirection=rtl;fontStyle=1;rounded=1;shadow=0;perimeterSpacing=0;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;" value="כרטיס רשת &#xa;NIC" vertex="1">
-          <mxGeometry height="54" width="162" x="997" y="905" as="geometry" />
+          <mxGeometry height="54" width="162" x="1166.5" y="885" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-3" parent="1" style="whiteSpace=wrap;strokeWidth=3;textDirection=rtl;fontStyle=1;rounded=1;shadow=0;perimeterSpacing=0;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;" value="(Pcap) לכידת פאקטות" vertex="1">
-          <mxGeometry height="54" width="195" x="980" y="1009" as="geometry" />
+          <mxGeometry height="54" width="195" x="1149.5" y="989" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-4" parent="1" style="whiteSpace=wrap;strokeWidth=3;textDirection=rtl;fontStyle=1;rounded=1;shadow=0;perimeterSpacing=0;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;" value="פענוח לנתונים קריאים" vertex="1">
-          <mxGeometry height="54" width="196" x="980" y="1113" as="geometry" />
+          <mxGeometry height="54" width="196" x="1149.5" y="1093" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-5" parent="1" style="whiteSpace=wrap;strokeWidth=3;textDirection=rtl;fontStyle=1;rounded=1;shadow=0;perimeterSpacing=0;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;" value="תור נתונים &#xa;Queue" vertex="1">
-          <mxGeometry height="54" width="177" x="990" y="1217" as="geometry" />
+          <mxGeometry height="54" width="177" x="1159.5" y="1197" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-6" parent="1" style="whiteSpace=wrap;strokeWidth=3;textDirection=rtl;fontStyle=1;rounded=1;shadow=0;perimeterSpacing=0;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;" value="עדכון ממשק משתמש" vertex="1">
-          <mxGeometry height="54" width="192" x="982" y="1321" as="geometry" />
+          <mxGeometry height="54" width="192" x="1151.5" y="1301" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-7" edge="1" parent="1" source="q0hHSYcgPhRE0K27VoxZ-2" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;textDirection=rtl;fontStyle=1" target="q0hHSYcgPhRE0K27VoxZ-3" value="">
           <mxGeometry relative="1" as="geometry">
@@ -123,19 +123,19 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-45" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=light-dark(#6F0000,#000000);fillColor=light-dark(#6a00ff, #FF577E);align=center;verticalAlign=middle;rounded=1;fontColor=#FFFFFF;fontStyle=1" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;&lt;span&gt;לכידת תעבורה (Sniffing)&lt;/span&gt;&lt;/font&gt;" vertex="1">
-          <mxGeometry height="50" width="200" x="980" y="830" as="geometry" />
+          <mxGeometry height="50" width="200" x="1149.5" y="810" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-46" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=light-dark(#3700CC,#000000);fillColor=light-dark(#6A00FF,#F12FFF);align=center;verticalAlign=middle;rounded=1;fontColor=#ffffff;fontStyle=1" value="&lt;font style=&quot;font-size: 21px; color: light-dark(rgb(255, 255, 255), rgb(255, 255, 255));&quot;&gt;זיהוי אנומליות&lt;/font&gt;" vertex="1">
           <mxGeometry height="50" width="200" x="1322.5" y="50" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-61" parent="1" style="whiteSpace=wrap;strokeWidth=3;fontStyle=1;rounded=1;shadow=0;perimeterSpacing=0;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;" value="שרת מרכזי&#xa;RSA ייצור מפתחות " vertex="1">
-          <mxGeometry height="78" width="176" x="1339.5" y="910" as="geometry" />
+          <mxGeometry height="78" width="176" x="1509" y="890" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-62" parent="1" style="whiteSpace=wrap;strokeWidth=3;fontStyle=1;rounded=1;shadow=0;perimeterSpacing=0;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;" value="סוכן קצה&#xa;איסוף והצפנת נתונים" vertex="1">
-          <mxGeometry height="78" width="190" x="1332.5" y="1061" as="geometry" />
+          <mxGeometry height="78" width="190" x="1502" y="1041" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-63" parent="1" style="whiteSpace=wrap;strokeWidth=3;fontStyle=1;rounded=1;shadow=0;perimeterSpacing=0;fontSize=16;fillColor=#e1d5e7;strokeColor=#9673a6;" value="שרת מרכזי&#xa;פענוח ורענון ממשק" vertex="1">
-          <mxGeometry height="78" width="179" x="1337.5" y="1212" as="geometry" />
+          <mxGeometry height="78" width="179" x="1507" y="1192" as="geometry" />
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-64" edge="1" parent="1" source="q0hHSYcgPhRE0K27VoxZ-61" style="curved=1;startArrow=none;endArrow=block;exitX=0.5;exitY=1;entryX=0.5;entryY=0;rounded=0;fontStyle=1;fontSize=14;" target="q0hHSYcgPhRE0K27VoxZ-62" value="שליחת מפתח פומבי">
           <mxGeometry relative="1" as="geometry">
@@ -148,7 +148,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="q0hHSYcgPhRE0K27VoxZ-66" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=light-dark(#3700CC,#000000);fillColor=light-dark(#6A00FF,#FFA51F);align=center;verticalAlign=middle;rounded=1;fontColor=#FFFFFF;fontStyle=1" value="&lt;font style=&quot;font-size: 21px;&quot;&gt;&lt;span&gt;תקשורת מאובטחת&lt;/span&gt;&lt;/font&gt;" vertex="1">
-          <mxGeometry height="50" width="200" x="1327" y="830" as="geometry" />
+          <mxGeometry height="50" width="200" x="1496.5" y="810" as="geometry" />
         </mxCell>
         <mxCell id="69H8ZttxyOQc8Sx1NIhs-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;p&gt;&lt;font face=&quot;rubik&quot;&gt;&lt;span style=&quot;font-size: 52px;&quot;&gt;&lt;b&gt;UML תרשים&lt;/b&gt;&lt;/span&gt;&lt;/font&gt;&lt;/p&gt;" vertex="1">
           <mxGeometry height="120" width="330" x="-370" y="640" as="geometry" />

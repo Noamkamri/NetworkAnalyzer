@@ -33,8 +33,8 @@ namespace NetworkScanner
             DeviceList.SelectionChanged += OnDeviceSelectionChanged;
 
             // re-scan for interfaces every 5 seconds in case the user plugs something in after opening the app
-            var timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(5);
+            _interfaceRefreshTimer = new DispatcherTimer();
+            _interfaceRefreshTimer.Interval = TimeSpan.FromSeconds(5);
 
             _interfaceRefreshTimer.Tick += RefreshInterfaces;
             _interfaceRefreshTimer.Start();

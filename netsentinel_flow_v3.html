@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NetSentinel — Flow</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #FBFBFA;
+    --ink: #1A1A18;
+    --muted: #6B6B66;
+    --line: #C9C9C2;
+    --agent: #2563EB;
+    --agentbg: #EFF4FE;
+    --server: #7C3AED;
+    --serverbg: #F3EFFE;
+    --net: #059669;
+    --netbg: #E9F7F1;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Arial, sans-serif;
+    margin: 0;
+    padding: 32px 20px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 6px 0;
+  }
+  p.sub {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 28px 0;
+  }
+  .wrap {
+    max-width: 1250px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    align-items: start;
+  }
+  .col { padding: 0 0 28px 0; }
+  .col.agent { border-right: 1px solid var(--line); }
+  .col-head {
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+  }
+  .col.agent .col-head { background: var(--agentbg); color: var(--agent); }
+  .col.server .col-head { background: var(--serverbg); color: var(--server); }
+  .col-head .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .col.agent .dot { background: var(--agent); }
+  .col.server .dot { background: var(--server); }
+  .mermaid { display: flex; justify-content: center; padding-top: 10px; }
+
+  .bridge {
+    max-width: 1250px;
+    margin: 16px auto 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--netbg);
+    border: 1px solid var(--net);
+    border-radius: 12px;
+    color: #05543C;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .bridge .arrow { color: var(--net); font-size: 20px; font-weight: 700; }
+
+  #legend {
+    max-width: 1250px;
+    margin: 20px auto 0 auto;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; }
+  .swatch { width: 13px; height: 13px; border-radius: 4px; display: inline-block; }
+
+  @media (max-width: 900px) {
+    .wrap { grid-template-columns: 1fr; }
+    .col.agent { border-right: none; border-bottom: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+
+<h1>NetSentinel — how it all flows</h1>
+<p class="sub">two programs running at once. the agent captures and analyzes every packet, the server collects and displays. they talk over an encrypted tcp link.</p>
+
+<div class="wrap">
+  <div class="col agent">
+    <div class="col-head"><span class="dot"></span>Agent &nbsp;·&nbsp; NetworkScanner</div>
+    <pre class="mermaid">
+flowchart TD
+    A1["user picks a network device<br/><span class='f'>ChooseDevice.xaml.cs</span>"]:::step
+    A2["capture starts, device opened in<br/>promiscuous mode = grab ALL traffic<br/><span class='f'>PacketScanner.Start()</span>"]:::step
+    A3["a background thread is started to<br/>watch for floods every second<br/><span class='f'>PreventFloodAnomalies()</span>"]:::side
+    A4["Npcap fires an event for<br/>every single packet that arrives<br/><span class='f'>OnPacketArrival()</span>"]:::step
+    A5["raw packet dropped into a queue<br/>if full → packet is dropped<br/><span class='f'>PacketQueue · TryAdd() · max 6000</span>"]:::step
+    A6["4 worker threads pull from the queue<br/>at the same time<br/><span class='f'>GetConsumingEnumerable()</span>"]:::step
+    A7["already blocked ip?<br/>skip it<br/><span class='f'>stats.IsBlocked()</span>"]:::decision
+    A8["parse the raw bytes into a packet<br/>extract ip, mac, ports<br/><span class='f'>BuildPacketInfo()</span>"]:::step
+    A9["figure out the protocol<br/>tls bytes → http text → port number<br/><span class='f'>DetectProtocol()</span>"]:::step
+    A10["count it by protocol<br/>tcp, udp, http, dns...<br/><span class='f'>UpdateProtocolCount()</span>"]:::step
+    A11["update per socket syn / icmp counters<br/><span class='f'>UpdateFloodPreventionStats()</span>"]:::step
+
+    subgraph ANOM["anomaly checks — run alongside counting"]
+      direction TB
+      C1{"same ip claims a<br/>different mac?"}:::decision
+      C1 -- yes --> C1y["ARP spoofing"]:::alert
+      C2{"same dns tx id<br/>from a different mac?"}:::decision
+      C2 -- yes --> C2y["DNS spoofing"]:::alert
+      C3{"syn or icmp count<br/>over the threshold?"}:::decision
+      C3 -- yes --> C3y["SYN / ICMP flood"]:::alert
+    end
+
+    A12["show the packet in the table<br/>every 50ms, not per packet<br/><span class='f'>FlushPendingPackets() · DataGrid</span>"]:::step
+    A13["anomaly found!<br/><span class='f'>RaiseAnomaly()</span>"]:::alert
+    A14["block the ip via windows firewall<br/><span class='f'>AnomalyBlocker · netsh</span>"]:::alert
+    A15["show red alert overlay on screen"]:::alert
+    A16["send an update to the server<br/><span class='f'>SendMessageToServer()</span>"]:::send
+
+    A1 --> A2 --> A3 --> A4 --> A5 --> A6 --> A7
+    A7 --> A8 --> A9
+    A9 --> A10
+    A8 --> A11
+    A8 --> C1
+    A8 --> C2
+    A11 --> C3
+    A10 --> A12
+    C1y --> A13
+    C2y --> A13
+    C3y --> A13
+    A13 --> A14
+    A13 --> A15
+    A12 --> A16
+    A13 --> A16
+
+    classDef step fill:#EFF4FE,stroke:#2563EB,stroke-width:1px,color:#14285C,rx:8,ry:8;
+    classDef side fill:#EAF0FB,stroke:#6B8FD6,stroke-width:1px,color:#25406E,rx:8,ry:8;
+    classDef decision fill:#FEF6E7,stroke:#D97706,stroke-width:1px,color:#7A3D06;
+    classDef alert fill:#FDECEC,stroke:#DC2626,stroke-width:1px,color:#7A1515,rx:8,ry:8;
+    classDef send fill:#E9F7F1,stroke:#059669,stroke-width:1.5px,color:#05543C,rx:8,ry:8;
+    </pre>
+  </div>
+
+  <div class="col server">
+    <div class="col-head"><span class="dot"></span>Server &nbsp;·&nbsp; ScannerServer</div>
+    <pre class="mermaid">
+flowchart TD
+    B1["server waits for agents<br/><span class='f'>TcpListener · port 8888</span>"]:::step
+    B2["an agent connects<br/>a ConnectedAgent object is created<br/><span class='f'>StartListening()</span>"]:::step
+    B3["server sends its rsa public key<br/>to the agent first"]:::step
+    B4["receive an encrypted line (base64)<br/><span class='f'>HandleAgentMessages()</span>"]:::recv
+    B5["decrypt it with the rsa private key<br/>only the server has this key"]:::step
+    B6["read the message type<br/><span class='f'>ProcessMessage() · split by |</span>"]:::step
+    B7{"which type?"}:::decision
+    B7 -- "ALERT" --> B8["add to the agent's alert list<br/>mark status ANOMALY DETECTED"]:::alert
+    B7 -- "STATS" --> B9["update total packet count"]:::step
+    B7 -- "HEARTBEAT" --> B10["mark agent Online / Scanning"]:::step
+    B7 -- "PROTOCOL_STATS" --> B11["update per protocol counts"]:::step
+    B12["server screen refreshes<br/>agent list, status, charts"]:::step
+
+    B1 --> B2 --> B3 --> B4 --> B5 --> B6 --> B7
+    B8 --> B12
+    B9 --> B12
+    B10 --> B12
+    B11 --> B12
+
+    classDef step fill:#F3EFFE,stroke:#7C3AED,stroke-width:1px,color:#3B1D6E,rx:8,ry:8;
+    classDef decision fill:#FEF6E7,stroke:#D97706,stroke-width:1px,color:#7A3D06;
+    classDef alert fill:#FDECEC,stroke:#DC2626,stroke-width:1px,color:#7A1515,rx:8,ry:8;
+    classDef recv fill:#E9F7F1,stroke:#059669,stroke-width:1.5px,color:#05543C,rx:8,ry:8;
+    </pre>
+  </div>
+</div>
+
+<div class="bridge">
+  <span>agent encrypts with the RSA public key, sends over TCP</span>
+  <span class="arrow">&#8594;</span>
+  <span>server decrypts with its RSA private key</span>
+</div>
+
+<div id="legend">
+  <div class="legend-item"><span class="swatch" style="background:#2563EB"></span> agent step</div>
+  <div class="legend-item"><span class="swatch" style="background:#7C3AED"></span> server step</div>
+  <div class="legend-item"><span class="swatch" style="background:#D97706"></span> decision</div>
+  <div class="legend-item"><span class="swatch" style="background:#DC2626"></span> anomaly</div>
+  <div class="legend-item"><span class="swatch" style="background:#059669"></span> the encrypted tcp link</div>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      fontFamily: 'Arial, sans-serif',
+      fontSize: '13px',
+      lineColor: '#9AA0A6'
+    },
+    flowchart: { curve: 'basis', nodeSpacing: 28, rankSpacing: 38, padding: 6 }
+  });
+  const style = document.createElement('style');
+  style.textContent = ".f{font-size:10.5px;opacity:0.75;}";
+  document.head.appendChild(style);
+</script>
+
+</body>
+</html>

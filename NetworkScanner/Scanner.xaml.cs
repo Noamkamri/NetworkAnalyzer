@@ -24,8 +24,10 @@ namespace NetworkScanner
         private int _ignoreScrollEvents = 0;
         private bool _isSniffing = true;
 
+        // cap the list so the ui doesnt run out of memory during long captures
         private const int MaxDisplayedPackets = 20000;
-        private static readonly TimeSpan UIFlushInterval = TimeSpan.FromMilliseconds(50);
+        // flush the pending queue to the ui every 50ms, smooth enough without hammering the dispatcher
+        private static readonly TimeSpan UIFlushInterval = TimeSpan.FromMilliseconds(50); // the ui refreshes every 50ms
 
         private readonly ConcurrentQueue<PacketScanner.PacketInfo> _pendingPackets = new();
         private DispatcherTimer _uiFlushTimer;
@@ -35,37 +37,39 @@ namespace NetworkScanner
 
         private ICaptureDevice _currentDevice;
 
-        // --- Class Members for Evil Twin Defense ---
+        // we snapshot the bssid and ssid on startup, then check every 5s if they diverged
         private DispatcherTimer _securityTimer;
-        private string _baselineBssid = "";
-        private string _baselineSsid = "";
+        private string _baselineBssid = ""; //the MAC address of the wifi
+        private string _baselineSsid = ""; // the wifi name
 
-        // Last anomalyer info
+        // stored when an alert fires so the block button knows what to block
         private string _alertIp = "";
         private int _alertPort = 0;
         private string _alertType = "";
 
-        /// Central server communication
+        // rsa encrypted tcp connection to the central management server
         private TcpClient _serverClient;
         private StreamWriter _serverWriter;
-        private RSACryptoServiceProvider _rsaClient;
+        private RSACryptoServiceProvider _rsaClient; // public key of the server
 
+        // true once the user has stopped sniffing at least once, controls whether we show resume options
         private bool hasPreviousData = false;
-        public ObservableCollection<PacketScanner.PacketInfo> Packets { get; }
-            = new ObservableCollection<PacketScanner.PacketInfo>();
 
+        // list of packets shown in the ui, auto updates the DataGrid whenever we add or remove from it
+        public ObservableCollection<PacketScanner.PacketInfo> Packets { get; }
+            = new ObservableCollection<PacketScanner.PacketInfo>(); 
+        
         public ProtocolBarsVM ProtocolVM { get; private set; }
 
         public Scanner(ICaptureDevice device)
         {
             InitializeComponent();
+            PacketsGrid.ItemsSource = Packets; // hook the table up to our observable list
 
-            PacketsGrid.ItemsSource = Packets;
-
-            _currentDevice = device;
+            _currentDevice = device; // save it so we can restart the same device later
 
             scanner = new PacketScanner();
-            scanner.SetUI(this);
+            scanner.SetUI(this); // let it call back into this page for packets/alerts
             scanner.Start(device);
 
             StartEvilTwinDefense();
@@ -74,25 +78,26 @@ namespace NetworkScanner
             {
                 Interval = UIFlushInterval
             };
-            _uiFlushTimer.Tick += FlushPendingPackets;
+            _uiFlushTimer.Tick += FlushPendingPackets; // dump queued packets into the ui every 50ms
             _uiFlushTimer.Start();
 
-            ProtocolVM = new ProtocolBarsVM(scanner.GetProtocolCountSnapshot);
-            DataContext = this;
+            ProtocolVM = new ProtocolBarsVM(scanner.GetProtocolCountSnapshot); // pass the snapshot func in
+            DataContext = this; // so xaml bindings like {Binding Packets} actually work
 
             Loaded += Scanner_Loaded;
             Unloaded += Scanner_Unloaded;
 
-            // Connect to the central management server
+            // try to connect to the central server, fails silently if it's not running
             ConnectToCentralServer("127.0.0.1", 8888);
 
-            // Timer for Protocol Stats
+            // sends protocol counts to the server every second so it has a live stats feed
             _statsSyncTimer = new DispatcherTimer(DispatcherPriority.Background)
             {
                 Interval = TimeSpan.FromSeconds(1)
             };
 
-            _statsSyncTimer.Tick += (s, e) =>
+            // every second, send the server our current protocol counts so its stats stay live
+            _statsSyncTimer.Tick += (s, e) => // inline function
             {
                 if (!_isSniffing) return;
                 var counts = scanner.GetProtocolCountSnapshot();
@@ -102,7 +107,8 @@ namespace NetworkScanner
             _statsSyncTimer.Start();
         }
 
-        public Scanner(List<PacketScanner.PacketInfo> packets)
+        public Scanner(List<PacketScanner.PacketInfo> packets) // second constructor used when loading a saved
+                                                               // pcap file instead of doing a live capture
         {
             InitializeComponent();
 
@@ -111,12 +117,14 @@ namespace NetworkScanner
             foreach (var packet in packets)
                 Packets.Add(packet);
 
+            // disable stop button since there's nothing running to stop
             StopButton.IsEnabled = false;
             StopButton.Content = "Stopped";
             StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1E2535"));
 
             SavePcapButton.IsEnabled = true;
 
+            // pass an empty snapshot provider since there's no live scanner running
             ProtocolVM = new ProtocolBarsVM(() => new Statistics.ProtocolCount());
             DataContext = this;
 
@@ -124,11 +132,8 @@ namespace NetworkScanner
             Unloaded += Scanner_Unloaded;
         }
 
-        // ─────────────────────────────────────────────────
-        // EVIL TWIN DETECTION
-        // ─────────────────────────────────────────────────
-
-        private string GetNetshValue(string key)
+        private string GetNetshValue(string key) // runs "netsh wlan show interfaces" and pulls out the
+                                                 // value for a specific field, like SSID or BSSID
         {
             try
             {
@@ -136,7 +141,7 @@ namespace NetworkScanner
                 {
                     FileName = "netsh",
                     Arguments = "wlan show interfaces",
-                    RedirectStandardOutput = true,
+                    RedirectStandardOutput = true, // need to actually read the output this time
                     UseShellExecute = false,
                     CreateNoWindow = true
                 };
@@ -146,27 +151,30 @@ namespace NetworkScanner
                     string output = process.StandardOutput.ReadToEnd();
                     foreach (string line in output.Split(new[] { Environment.NewLine }, StringSplitOptions.None))
                     {
+                        // the "SSID" check would also match "BSSID" lines, so we explicitly skip those
                         if (line.Contains(key) && (key != "SSID" || !line.Contains("BSSID")))
                         {
                             int colonIndex = line.IndexOf(':');
                             if (colonIndex != -1)
-                                return line.Substring(colonIndex + 1).Trim();
+                                return line.Substring(colonIndex + 1).Trim(); // everything after the colon
                         }
                     }
                 }
             }
-            catch { }
+            catch { } // not on wifi, or netsh failed, just give up quietly
+
             return "";
         }
 
         private string GetCurrentBssid() => GetNetshValue("BSSID").ToUpper();
         private string GetCurrentSsid() => GetNetshValue("SSID");
 
-        private void StartEvilTwinDefense()
+        private void StartEvilTwinDefense() // not in use anymore
         {
             _baselineBssid = GetCurrentBssid();
             _baselineSsid = GetCurrentSsid();
 
+            // no bssid means we're not on wifi, nothing to monitor
             if (string.IsNullOrEmpty(_baselineBssid)) return;
 
             _securityTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
@@ -186,13 +194,9 @@ namespace NetworkScanner
             _securityTimer.Start();
         }
 
-        // ─────────────────────────────────────────────────
-        // INLINE SECURITY ALERT
-        // ─────────────────────────────────────────────────
-
         public void RaiseAnomaly(string type, string target, string details, string ip = "", int port = 0)
         {
-            // Fire and forget the network transmission
+            // send the alert to the server on a background thread so it doesn't block the ui
             Task.Run(() => SendMessageToServer($"ALERT|{type}|{target} - {details}"));
 
             Dispatcher.Invoke(() =>
@@ -226,15 +230,14 @@ namespace NetworkScanner
 
                     _rsaClient = new RSACryptoServiceProvider(2048);
 
-                    // 1. Receive Public Key from Server
+                    // server sends its public key first so we can encrypt everything we send
                     string publicKeyXml = await reader.ReadLineAsync();
 
                     if (!string.IsNullOrEmpty(publicKeyXml))
                     {
-                        // Load the server's lock into our RSA client
                         _rsaClient.FromXmlString(publicKeyXml);
 
-                        // 2. Send an initial encrypted "Hello"
+                        // send a heartbeat right away so the server knows we're connected
                         SendMessageToServer("HEARTBEAT|0");
                     }
                 }
@@ -248,16 +251,10 @@ namespace NetworkScanner
             {
                 if (_serverWriter != null && _serverClient.Connected && _rsaClient != null)
                 {
-                    // 1. Convert to bytes
                     byte[] dataToEncrypt = Encoding.UTF8.GetBytes(message);
-
-                    // 2. Encrypt
                     byte[] encryptedData = _rsaClient.Encrypt(dataToEncrypt, false);
-
-                    // 3. Convert to Base64
+                    // base64 so we can send the encrypted bytes as a plain text line over the stream
                     string base64Encrypted = Convert.ToBase64String(encryptedData);
-
-                    // 4. Send
                     _serverWriter.WriteLine(base64Encrypted);
                 }
             }
@@ -274,6 +271,8 @@ namespace NetworkScanner
         {
             if (!string.IsNullOrEmpty(_alertIp))
             {
+                // pick the right block method based on the attack type
+                // icmp needs its own rule, arp and evil twin block the whole ip, everything else blocks by port
                 if (_alertType.Contains("ICMP"))
                     AnomalyBlocker.BlockIcmp(_alertIp);
                 else if (_alertType.Contains("ARP") || _alertType.Contains("Evil Twin"))
@@ -297,6 +296,7 @@ namespace NetworkScanner
 
         private void FlushPendingPackets(object sender, EventArgs e)
         {
+            // cap per flush so one busy tick doesn't freeze the ui for too long
             const int maxPerFlush = 500;
             int count = 0;
             while (count < maxPerFlush && _pendingPackets.TryDequeue(out var packet))
@@ -305,6 +305,7 @@ namespace NetworkScanner
                 count++;
                 _totalScannedPackets++;
             }
+            // trim oldest packets from the top to stay under the display limit
             int excess = Packets.Count - MaxDisplayedPackets;
             for (int i = 0; i < excess; i++) Packets.RemoveAt(0);
             if (count > 0 && _followPackets) ForceScrollToBottom();
@@ -315,20 +316,22 @@ namespace NetworkScanner
             }
         }
 
-        private void Scanner_Loaded(object sender, RoutedEventArgs e)
+        private void Scanner_Loaded(object sender, RoutedEventArgs e) // page finished loading, grab the datagrid's
+                                                                      // internal scrollbar and start auto scrolling
         {
-            _packetsScrollViewer ??= FindVisualChild<ScrollViewer>(PacketsGrid);
+            _packetsScrollViewer ??= FindVisualChild<ScrollViewer>(PacketsGrid); // only need to find it once
             if (_packetsScrollViewer != null) _packetsScrollViewer.ScrollChanged += PacketsScrollViewer_ScrollChanged;
             _followPackets = true;
             ForceScrollToBottom();
         }
 
-        private void Scanner_Unloaded(object sender, RoutedEventArgs e)
+        private void Scanner_Unloaded(object sender, RoutedEventArgs e) // page is being closed/navigated away from, stop
+                                                                        // everything so nothing keeps running in the background
         {
-            if (_packetsScrollViewer != null) _packetsScrollViewer.ScrollChanged -= PacketsScrollViewer_ScrollChanged;
-            if (ProtocolVM != null) ProtocolVM.IsMonitoring = false;
+            if (_packetsScrollViewer != null) _packetsScrollViewer.ScrollChanged -= PacketsScrollViewer_ScrollChanged; // unsub so we dont leak memory
+            if (ProtocolVM != null) ProtocolVM.IsMonitoring = false; // lets the chart loop exit on its own
             _uiFlushTimer?.Stop();
-            _securityTimer?.Stop();
+            _securityTimer?.Stop(); // might be null if we werent on wifi to begin with
             _statsSyncTimer?.Stop();
         }
 
@@ -336,34 +339,31 @@ namespace NetworkScanner
         {
             if (_isSniffing)
             {
-                // עוצר את ההסנפה במחלקת ה-PacketScanner
-                // (אם הפונקציה שלך נקראת בשם אחר כמו StopCapture, שנה בהתאם)
                 scanner.Stop();
 
                 _isSniffing = false;
                 hasPreviousData = true;
 
                 StopButton.Content = "Start Sniffing";
-                StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981")); // צבע ירוק
+                StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#10B981"));
 
-                // מדליק את האפשרות לשמור קובץ
                 SavePcapButton.IsEnabled = true;
             }
             else
             {
                 if (hasPreviousData)
                 {
-                    // מעלים את הכפתור הראשי ומציג את שתי האפשרויות
+                    // show the resume options (continue or new session) instead of just restarting blindly
                     StopButton.Visibility = Visibility.Collapsed;
                     spResumeOptions.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    // מפעיל מחדש אם איכשהו הגענו לפה בלי נתונים
+                    // no previous data means we can just restart directly without asking
                     scanner.Start(_currentDevice);
                     _isSniffing = true;
                     StopButton.Content = "Stop Sniffing";
-                    StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626")); // חזרה לאדום
+                    StopButton.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DC2626"));
                     SavePcapButton.IsEnabled = false;
                 }
             }
@@ -371,7 +371,6 @@ namespace NetworkScanner
 
         private void BtnContinue_Click(object sender, RoutedEventArgs e)
         {
-            // מחזיר את התצוגה של הכפתור הראשי
             spResumeOptions.Visibility = Visibility.Collapsed;
             StopButton.Visibility = Visibility.Visible;
 
@@ -381,13 +380,12 @@ namespace NetworkScanner
             _isSniffing = true;
             SavePcapButton.IsEnabled = false;
 
-            // ממשיך את ההסנפה בלי למחוק כלום מהמסך
+            // resume without clearing anything, previous packets stay on screen
             scanner.Start(_currentDevice);
         }
 
         private void BtnNewSession_Click(object sender, RoutedEventArgs e)
         {
-            // מחזיר את התצוגה של הכפתור הראשי
             spResumeOptions.Visibility = Visibility.Collapsed;
             StopButton.Visibility = Visibility.Visible;
 
@@ -397,17 +395,16 @@ namespace NetworkScanner
             _isSniffing = true;
             SavePcapButton.IsEnabled = false;
 
-            // מאפס את כל הנתונים במסך ומוחק סטטיסטיקות
+            // wipe the packet list and counter so we start completely fresh
             Packets.Clear();
             _totalScannedPackets = 0;
-            // *אם יש לך פונקציה ב-scanner שמאפסת סטטיסטיקות, קרא לה פה*
 
-            // מתחיל הסנפה נקייה לגמרי
             scanner.Start(_currentDevice);
         }
 
         private void SavePcapButton_Click(object sender, RoutedEventArgs e)
         {
+            // read from PacketsGrid.Items instead of Packets so the active filter is respected
             var packetsToSave = new List<PacketScanner.PacketInfo>();
             foreach (var item in PacketsGrid.Items)
             {
@@ -430,12 +427,17 @@ namespace NetworkScanner
             if (_packetsScrollViewer == null) return;
             bool atBottom = _packetsScrollViewer.ScrollableHeight <= 0 || _packetsScrollViewer.VerticalOffset >= _packetsScrollViewer.ScrollableHeight - 12;
             ScrollToBottomButton.Visibility = atBottom ? Visibility.Collapsed : Visibility.Visible;
+            // if only VerticalChange changed, the user scrolled manually so stop auto-following
             if (e.ExtentHeightChange == 0 && e.ViewportHeightChange == 0 && e.VerticalChange != 0) _followPackets = false;
+            // if they scrolled back to the bottom, resume auto-follow
             if (atBottom && userScroll_check(e)) _followPackets = true;
         }
+        // extent or vertical change means content changed or user moved the scrollbar
         private bool userScroll_check(ScrollChangedEventArgs e) => e.ExtentHeightChange != 0 || e.VerticalChange != 0;
 
         private void ScrollToBottomButton_Click(object sender, RoutedEventArgs e) { _followPackets = true; ForceScrollToBottom(); }
+        // _ignoreScrollEvents=6 gives the scrollviewer a few ticks to settle after we programmatically scroll,
+        // so those scroll events don't flip _followPackets back to false
         private void ForceScrollToBottom() { _ignoreScrollEvents = 6; _packetsScrollViewer?.ScrollToEnd(); }
 
         private static T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject
@@ -450,7 +452,7 @@ namespace NetworkScanner
             return null;
         }
 
-        private void CheckFilter(object sender, RoutedEventArgs e)
+        private void CheckFilter(object sender, RoutedEventArgs e) // filter box
         {
             string filterText = FilterTextBox.Text.Trim().ToLower();
             PacketsGrid.Items.Filter = item => {

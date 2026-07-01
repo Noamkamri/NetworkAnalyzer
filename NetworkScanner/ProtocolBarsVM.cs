@@ -9,7 +9,7 @@ using SkiaSharp;
 
 namespace NetworkScanner
 {
-    // 1. Inherit from ObservableValue so the bar width animates automatically
+    // inheriting ObservableValue means the chart animates automatically when Value changes
     public class ProtocolInfo : ObservableValue
     {
         public ProtocolInfo(string name, int value, SolidColorPaint paint)
@@ -33,7 +33,7 @@ namespace NetworkScanner
             _snapshotProvider = snapshotProvider;
             _data = FetchEmpty();
 
-            // 2. Create the Series ONCE. We will not recreate it, just update its Values.
+            // series is created once and reused, replacing it would break the animation
             var rowSeries = new RowSeries<ProtocolInfo>
             {
                 Values = _data,
@@ -42,8 +42,8 @@ namespace NetworkScanner
                 DataLabelsPaint = new SolidColorPaint(SKColors.White),
                 DataLabelsPosition = DataLabelsPosition.End,
 
-                // MAPPING: This creates the racing effect.
-                // X = Value (Length), Y = Index (Rank in the list)
+                // x is the packet count, y is the current position in the sorted array.
+                // when we re-sort, the index changes and livecharts animates the bar moving up or down
                 Mapping = (item, index) => new Coordinate(item.Value ?? 0, index),
 
                 DataLabelsFormatter = p =>
@@ -53,7 +53,7 @@ namespace NetworkScanner
                 }
             };
 
-            // 3. Apply Colors individually
+            // can't set per-bar color directly in the series, so we hook into PointMeasured to do it
             rowSeries.PointMeasured += point =>
             {
                 if (point.Visual is null || point.Model is null) return;
@@ -79,14 +79,9 @@ namespace NetworkScanner
 
             while (IsMonitoring)
             {
-                // A. Get Data from your Statistics class
                 var s = _snapshotProvider();
 
-                // B. Update existing objects (Do not create new ones!)
-                //    Note: Using the EXACT field names from your Statistics.cs
-
-                //MessageBox.Show(s.UDP.ToString());
-
+                // update values in place instead of creating new objects, otherwise the animation resets
                 UpdateValue("TCP", s.TCP);
                 UpdateValue("UDP", s.UDP);
                 UpdateValue("HTTP", s.HTTP);
@@ -96,14 +91,13 @@ namespace NetworkScanner
                 UpdateValue("DHCP", s.DHCP);
                 UpdateValue("DNS", s.DNS);
 
-                // C. SORT the array
-                //    Because we use "Mapping", changing the index triggers the animation.
+                // re-sort so the bar with the most packets floats to the top
                 _data = _data.OrderBy(x => x.Value).ToArray();
 
-                // D. Tell the chart the order changed
+                // reassign Values to tell livecharts the order changed and trigger the race animation
                 Series[0].Values = _data;
 
-                await Task.Delay(250);
+                await Task.Delay(250); // protocols chart refreshes 4 times a second
             }
         }
 
@@ -117,7 +111,7 @@ namespace NetworkScanner
             }
         }
 
-        // Helper to initialize the list with 0 values and correct colors
+        // starts everything at 0 so the chart shows all bars immediately, even before any traffic
         private static ProtocolInfo[] FetchEmpty() => new[]
         {
             new ProtocolInfo("TCP",   0, GetPaintByName("TCP")),

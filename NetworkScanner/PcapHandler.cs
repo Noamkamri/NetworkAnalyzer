@@ -15,7 +15,7 @@ namespace NetworkScanner
         private const uint   PcapMagicNumber  = 0xa1b2c3d4;
         private const short  PcapMajorVersion = 2;
         private const short  PcapMinorVersion = 4;
-        private const int    PcapSnapLen      = 65535;
+        private const int    PcapSnapLen      = 65535; //max bytes captured per packet
         private const int    PcapNetworkEthernet = 1;
 
         private const ushort EtherTypeIPv4    = 0x0800;
@@ -34,16 +34,16 @@ namespace NetworkScanner
 
         public static void SaveToPcap(string filePath, List<PacketInfo> packets)
         {
-            using var fs     = new FileStream(filePath, FileMode.Create);
+            using var fs = new FileStream(filePath, FileMode.Create);
             using var writer = new BinaryWriter(fs);
 
-            WriteGlobalHeader(writer);
+            WriteGlobalHeader(writer); //write the global header into the Pcap file
 
-            foreach (var packet in packets)
+            foreach (var packet in packets) // write each packet into the Pcap file
             {
                 byte[] frame = BuildFrame(packet);
-                WritePacketHeader(writer, packet.Timestamp, frame.Length);
-                writer.Write(frame);
+                WritePacketHeader(writer, packet.Timestamp, frame.Length); //write packet header
+                writer.Write(frame); // write packet data
             }
         }
 
@@ -61,7 +61,8 @@ namespace NetworkScanner
                 (DateTime timestamp, int savedLength) = ReadPacketHeader(reader);
 
                 byte[] frame = reader.ReadBytes(savedLength);
-                if (frame.Length < MinFrameSize) continue;
+                // skip anything too small to be a valid ethernet + ipv4 frame
+            if (frame.Length < MinFrameSize) continue;
 
                 PacketInfo? packet = ParseFrame(frame, timestamp);
                 if (packet.HasValue)
@@ -125,17 +126,18 @@ namespace NetworkScanner
             bw.Write(IPAddress.HostToNetworkOrder((short)p.SrcPort));
             bw.Write(IPAddress.HostToNetworkOrder((short)p.DstPort));
 
-            // Pad to original packet length if needed
+            // pad with zeros to match the original captured length so wireshark reads the frame correctly
             int padding = p.Length - (int)ms.Length;
             if (padding > 0) bw.Write(new byte[padding]);
 
             return ms.ToArray();
         }
 
-        // ─── Load Helpers ─────────────────────────────────────────────────────────
+        // Load Helpers
 
         private static void ValidateAndSkipGlobalHeader(BinaryReader reader)
         {
+            // the magic number tells us this is a valid pcap file, wrong value means it's corrupt or the wrong format
             uint magic = reader.ReadUInt32();
             if (magic != PcapMagicNumber)
                 throw new InvalidDataException($"Invalid pcap file. Expected magic 0x{PcapMagicNumber:X8}, got 0x{magic:X8}.");
@@ -150,7 +152,7 @@ namespace NetworkScanner
 
         private static (DateTime timestamp, int savedLength) ReadPacketHeader(BinaryReader reader)
         {
-            int seconds      = reader.ReadInt32();
+            int seconds = reader.ReadInt32();
             int microseconds = reader.ReadInt32();
             int savedLength  = reader.ReadInt32();
             reader.ReadInt32(); // Original length (not needed)
@@ -169,10 +171,11 @@ namespace NetworkScanner
                 int offset = 0;
 
                 // Ethernet header (14 bytes)
-                string macDst   = FormatMac(frame, offset); offset += 6;
-                string macSrc   = FormatMac(frame, offset); offset += 6;
+                string macDst = FormatMac(frame, offset); offset += 6;
+                string macSrc = FormatMac(frame, offset); offset += 6;
                 ushort etherType = ReadUInt16BigEndian(frame, offset); offset += 2;
 
+                // we only handle ipv4 frames, anything else (ipv6, arp raw, etc.) gets skipped
                 if (etherType != EtherTypeIPv4) return null;
 
                 // IPv4 header (20 bytes)
@@ -196,7 +199,7 @@ namespace NetworkScanner
 
                 // Transport ports (4 bytes)
                 int srcPort = 0, dstPort = 0;
-                if (frame.Length >= offset + 4)
+                if (frame.Length >= offset + 4) // only try to read ports if there are actually at least 4 more bytes left in the frame
                 {
                     srcPort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(frame, offset)); offset += 2;
                     dstPort = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(frame, offset));
@@ -223,15 +226,14 @@ namespace NetworkScanner
 
         // ─── Utility ──────────────────────────────────────────────────────────────
 
-        /// <summary>Parses a colon-separated MAC string into 6 bytes.</summary>
+        // PhysicalAddress.Parse expects dashes not colons, so we convert first
         private static byte[] ParseMacAddress(string mac)
             => PhysicalAddress.Parse(mac.Replace(":", "-")).GetAddressBytes();
 
-        /// <summary>Formats 6 bytes starting at offset as a colon-separated MAC string.</summary>
         private static string FormatMac(byte[] frame, int offset)
             => string.Join(":", frame.Skip(offset).Take(6).Select(b => b.ToString("X2")));
 
-        /// <summary>Returns the 4 IPv4 bytes of an IP string, or 0.0.0.0 if invalid.</summary>
+        // falls back to 0.0.0.0 if the string isn't a valid ipv4, so we never crash writing the frame
         private static byte[] GetIPv4Bytes(string ip)
         {
             if (IPAddress.TryParse(ip, out IPAddress addr) &&
@@ -241,11 +243,10 @@ namespace NetworkScanner
             return new byte[] { 0, 0, 0, 0 };
         }
 
-        /// <summary>Reads 4 bytes from frame at offset as an IPv4 address string.</summary>
         private static string ReadIPv4(byte[] frame, int offset)
             => new IPAddress(new[] { frame[offset], frame[offset + 1], frame[offset + 2], frame[offset + 3] }).ToString();
 
-        /// <summary>Reads a big-endian UInt16 from two bytes.</summary>
+        // network byte order is big endian but x86 is little endian, so we have to flip the bytes manually
         private static ushort ReadUInt16BigEndian(byte[] data, int offset)
             => (ushort)((data[offset] << 8) | data[offset + 1]);
     }

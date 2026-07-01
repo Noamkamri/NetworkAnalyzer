@@ -4,13 +4,11 @@ namespace NetworkScanner
 {
     class AnomalyBlocker
     {
-        // Blocks a TCP socket (SYN flood, DNS spoofing)
-        // Input: ip, port
+        // blocks a specific tcp port from an ip, used for syn flood and dns spoofing
         public static void Block(string ip, int port)
         {
             if (port > 0)
             {
-                // TCP rule with specific port (e.g. SYN flood)
                 RunNetsh(
                     $"advfirewall firewall add rule " +
                     $"name=\"Block {ip}:{port}\" " +
@@ -19,12 +17,13 @@ namespace NetworkScanner
             }
             else
             {
-                // No port — block all traffic from this IP (ARP spoofing, Evil Twin)
+                // no port means we want to cut off the ip entirely, e.g. arp spoofing or evil twin
                 BlockIp(ip);
             }
         }
 
-        // Blocks all ICMP traffic from a specific IP (ICMP flood)
+        // icmp gets its own rule because it's not tcp/udp so we can't just block a port
+        // block all icmp packets from an ip adress
         public static void BlockIcmp(string ip)
         {
             RunNetsh(
@@ -34,7 +33,7 @@ namespace NetworkScanner
             );
         }
 
-        // Blocks ALL traffic from a specific IP (ARP spoofing, Evil Twin, catch-all)
+        // blocks everything from this ip, used when we can't narrow it down to a port
         public static void BlockIp(string ip)
         {
             RunNetsh(
@@ -44,10 +43,10 @@ namespace NetworkScanner
             );
         }
 
-        // Removes all firewall rules created by our program
+        // cleans up all the firewall rules we added, called when the user stops sniffing
         public static void ClearAllBlocks()
         {
-            // Delete by name prefix — matches "Block *", "Block ICMP *", "Block IP *"
+            // all our rules start with "Block", so deleting by that prefix covers all three types
             foreach (var prefix in new[] { "Block " })
             {
                 RunNetsh($"advfirewall firewall delete rule name=\"{prefix}\"");

@@ -34,9 +34,10 @@ namespace NetworkScanner
         private Statistics stats;
         ConcurrentDictionary<string, string> arpTable = new();
 
-        // --- DNS Spoofing Variables ---
+        // tracks which mac first responded to each dns transaction id, so we can spot a second mac answering the same query
         private ConcurrentDictionary<ushort, string> dnsMacTracker = new();
         private DateTime _lastDnsAlertTime = DateTime.MinValue;
+        // cooldown lock so we don't spam alerts if a spoofed dns server is very chatty
         private readonly object _dnsAlertLock = new object();
 
         public void SetUI(Scanner page)
@@ -53,6 +54,7 @@ namespace NetworkScanner
             // Wire the Scanner page into Statistics so flood alerts use the overlay
             stats.SetUI(uiPage);
 
+            // promiscuous mode means we capture all traffic on the network, not just packets addressed to us
             device.Open(DeviceModes.Promiscuous, 10);
 
             StartProcessingThread();
@@ -72,29 +74,26 @@ namespace NetworkScanner
 
         private void StartProcessingThread()
         {
-            // לולאה המייצרת ומפעילה את כמות תהליכוני העבודה שהוגדרה
             for (int i = 0; i < WorkerCount; i++)
             {
                 Task.Run(() =>
                 {
-                    // לולאה חכמה השולפת חבילות בצורה מאובטחת וממתינה אוטומטית אם התור ריק
-                    foreach (var raw in PacketQueue.Queue.GetConsumingEnumerable())
+                    // GetConsumingEnumerable blocks automatically when the queue is empty, no need to spin or sleep
+                    foreach (var raw in PacketQueue.Queue.GetConsumingEnumerable()) // never ending loop, GetConsumingEnumerable() waits when the queue is empty instead of exiting
                     {
                         try
                         {
-                            // שלב הפענוח והפירסור של שכבות התקשורת
-                            var packet = Packet.ParsePacket(raw.LinkLayerType, raw.Data);
+                            var packet = Packet.ParsePacket(raw.LinkLayerType, raw.Data); 
                             var info = BuildPacketInfo(packet, raw);
 
-                            // בדיקה מול רכיב החסימות הדינמי
+                            // drop packets from ips we already blocked so they don't show up in the ui
                             if (stats.IsBlocked(info.SrcIP)) continue;
 
-                            // עדכון המונים, פילוח הסטטיסטיקות ובדיקת אנומליות ברשת
                             stats.UpdateFloodPreventionStats(packet, info);
                             stats.UpdateProtocolCount(in info);
                             HandleArp(packet);
 
-                            // הזרקת המידע המפוענח לממשק הגרפי במידה והפרוטוקול נתמך
+                            // only push to ui if the protocol is one we actually support
                             if (info.Protocol != "UNSUPPORTED")
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
@@ -114,10 +113,9 @@ namespace NetworkScanner
 
         private void OnPacketArrival(object sender, PacketCapture e)
         {
-            // השגת החבילה הגולמית מהאירוע של כרטיס הרשת
             var raw = e.GetPacket();
 
-            // ניסיון הוספה מהיר לתור המקבילי. אם התור מלא, תודפס שגיאה
+            // TryAdd is non blocking, if the queue is full we just drop the packet rather than slowing the capture thread
             if (!PacketQueue.Queue.TryAdd(raw))
                 Console.WriteLine("Queue full — packet dropped.");
         }
@@ -132,7 +130,7 @@ namespace NetworkScanner
             int dstPort = 0;
             string protocol = "";
 
-            var ip = packet.Extract<IPPacket>();
+            var ip = packet.Extract<IPPacket>(); // both src & dest
             if (ip != null)
             {
                 srcIP = ip.SourceAddress.ToString();
@@ -153,24 +151,22 @@ namespace NetworkScanner
                 packet.Extract<IcmpV6Packet>() != null)
                 protocol = "ICMP";
 
-            // בדיקה האם מדובר בחבילת TCP וחילוץ הנתונים וה-Payload שלה
             var tcp = packet.Extract<TcpPacket>();
             if (tcp != null)
             {
-                srcPort = tcp.SourcePort;                              // שמירת פורט המקור
-                dstPort = tcp.DestinationPort;                         // שמירת פורט היעד
-                protocol = DetectProtocol(tcp.PayloadData, srcPort, dstPort, "TCP"); // העברת ה-Payload לפענוח
+                srcPort = tcp.SourcePort;
+                dstPort = tcp.DestinationPort;
+                protocol = DetectProtocol(tcp.PayloadData, srcPort, dstPort, "TCP");
             }
 
-            // בדיקה האם מדובר בחבילת UDP וחילוץ הנתונים וה-Payload שלה
             var udp = packet.Extract<UdpPacket>();
             if (udp != null)
             {
-                srcPort = udp.SourcePort;                              // שמירת פורט המקור
-                dstPort = udp.DestinationPort;                         // שמירת פורט היעד
-                protocol = DetectProtocol(udp.PayloadData, srcPort, dstPort, "UDP"); // העברת ה-Payload לפענוח
+                srcPort = udp.SourcePort;
+                dstPort = udp.DestinationPort;
+                protocol = DetectProtocol(udp.PayloadData, srcPort, dstPort, "UDP");
 
-                // לוגיקה ייעודית עבור חבילות מסוג DNS
+                // dns responses come from port 53, first 2 bytes of the payload are the transaction id
                 if (protocol == "DNS" && srcPort == 53 && udp.PayloadData.Length >= 2)
                 {
                     ushort transactionID = (ushort)((udp.PayloadData[0] << 8) | udp.PayloadData[1]);
@@ -178,18 +174,16 @@ namespace NetworkScanner
                 }
             }
 
-            // בדיקה האם הפרוטוקול שפוענח מותר ונתמך על ידי רשימת הסינון של המערכת
             if (!allowedProtocols.Contains(protocol))
                 protocol = "UNSUPPORTED";
 
-            // השגת חותמת הזמן וסידור אזור הזמן המקומי (Local Time)
+            // SharpPcap timestamps can be unspecified kind, we normalize to local time so the ui shows the right time
             var ts = raw.Timeval.Date;
-            if (ts.Kind == DateTimeKind.Unspecified)
+            if (ts.Kind == DateTimeKind.Unspecified) // convert time to UTC
                 ts = DateTime.SpecifyKind(ts, DateTimeKind.Utc).ToLocalTime();
             else
                 ts = ts.ToLocalTime();
 
-            // בנייה והחזרה של ישות המידע המלאה (PacketInfo) לצורך עדכון מונים והזרקה ל-UI
             return new PacketInfo
             {
                 Timestamp = ts,
@@ -209,11 +203,11 @@ namespace NetworkScanner
             if (payload == null || payload.Length == 0)
                 return "TCP";
 
-            // שלב אימות החתימה הדינמי: זיהוי פרוטוקול HTTPS לפי חתימת בתים בינארית של TLS
+            // tls handshake always starts with 0x16 0x03, that's the reliable way to detect https regardless of port
             if (payload.Length >= 3 && payload[0] == 0x16 && payload[1] == 0x03)
                 return "HTTPS";
 
-            // שלב אימות החתימה הדינמי: זיהוי פרוטוקול HTTP לפי מילות מפתח בבתים הראשונים
+            // check if the payload starts with an http method keyword
             if (payload.Length >= 4)
             {
                 string startStr = System.Text.Encoding.ASCII.GetString(payload, 0, 4).ToUpper();
@@ -222,7 +216,8 @@ namespace NetworkScanner
                     return "HTTP";
             }
 
-            // במידה ולא נמצאה חתימה ייחודית בבתים, סיווג הפרוטוקול יתבצע על פי מספרי פורטים נפוצים
+            // no byte signature matched, fall back to well-known port numbers
+            // we prefer the lower port since that's more likely to be the service side
             int port = (srcPort <= 1023) ? srcPort : dstPort;
             return port switch
             {
@@ -238,15 +233,14 @@ namespace NetworkScanner
         {
             if (device != null && device.Started)
             {
-                device.StopCapture();
+                device.StopCapture(); // stop sniffing
                 device.Close();
-                stats?.ClearBlockedIps();
-                AnomalyBlocker.ClearAllBlocks();
+                stats?.ClearBlockedIps(); // clear block ips
+                AnomalyBlocker.ClearAllBlocks(); // clear firewall rules
             }
         }
 
-        public Statistics.ProtocolCount GetProtocolCountSnapshot()
-            => stats != null ? stats.GetProtocolCountSnapshot() : new Statistics.ProtocolCount();
+        public Statistics.ProtocolCount GetProtocolCountSnapshot() => stats != null ? stats.GetProtocolCountSnapshot() : new Statistics.ProtocolCount();
 
         void HandleArp(Packet packet)
         {
@@ -259,6 +253,8 @@ namespace NetworkScanner
             string ip = arp.SenderProtocolAddress.ToString();
             string mac = arp.SenderHardwareAddress.ToString();
 
+            // GetOrAdd returns the existing value if the key is already there, so if the mac we get back
+            // is different from the one in this packet, someone is claiming an ip that belongs to another mac
             string existingMac = arpTable.GetOrAdd(ip, mac);
             if (existingMac != mac)
                 RaiseAnomaly("ARP Spoofing", ip, $"MAC changed from {existingMac} to {mac}", ip, 0);
@@ -268,10 +264,12 @@ namespace NetworkScanner
         {
             if (dnsMacTracker.TryGetValue(txId, out string firstMac))
             {
+                // same transaction id answered by a different mac, that's dns spoofing
                 if (firstMac != sourceMac)
                 {
                     lock (_dnsAlertLock)
                     {
+                        // 4 second cooldown so we don't flood the alert overlay if it keeps happening
                         if ((DateTime.Now - _lastDnsAlertTime).TotalSeconds > 4)
                         {
                             _lastDnsAlertTime = DateTime.Now;
@@ -285,7 +283,9 @@ namespace NetworkScanner
             }
             else
             {
+                // first time we see this transaction id, record which mac answered it
                 dnsMacTracker.TryAdd(txId, sourceMac);
+                // clean up after 5 seconds so we don't leak memory if the query never gets a second reply
                 Task.Run(async () =>
                 {
                     await Task.Delay(5000);

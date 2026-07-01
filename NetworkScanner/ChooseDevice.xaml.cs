@@ -32,10 +32,9 @@ namespace NetworkScanner
 
             DeviceList.SelectionChanged += OnDeviceSelectionChanged;
 
-            _interfaceRefreshTimer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromSeconds(5)
-            };
+            // re-scan for interfaces every 5 seconds in case the user plugs something in after opening the app
+            var timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(5);
 
             _interfaceRefreshTimer.Tick += RefreshInterfaces;
             _interfaceRefreshTimer.Start();
@@ -43,6 +42,7 @@ namespace NetworkScanner
 
         private void LoadCaptureInterfaces()
         {
+            // remember what was selected before the refresh so we can restore it after rebuilding the list
             ICaptureDevice? previouslySelectedDevice = null;
 
             if (DeviceList.SelectedItem is CaptureInterfaceItem selectedItem)
@@ -58,6 +58,7 @@ namespace NetworkScanner
                 string description = captureDevice.Description ?? string.Empty;
                 string deviceName = captureDevice.Name ?? string.Empty;
 
+                // skip virtual and internal windows adapters that aren't real capture interfaces
                 if (description.Contains("Miniport") ||
                     description.Contains("Monitor") ||
                     description.Contains("Virtual") ||
@@ -68,6 +69,7 @@ namespace NetworkScanner
                     continue;
                 }
 
+                // default to ethernet, then check description and name keywords to detect wifi or loopback
                 string iconPath = "Icons/Ethernet.png";
                 string interfaceType = "Ethernet";
 
@@ -93,14 +95,24 @@ namespace NetworkScanner
                     IconPath = iconPath
                 });
             }
+            
+            DeviceList.ItemsSource = interfaceItems; // shows thelist of devices
 
-            DeviceList.ItemsSource = interfaceItems;
-
+            // restore the previous selection by matching on device name after the list rebuilds
             if (previouslySelectedDevice != null)
             {
-                DeviceList.SelectedItem = interfaceItems.FirstOrDefault(
-                    i => i.CaptureDevice?.Name == previouslySelectedDevice.Name
-                );
+                CaptureInterfaceItem? matchedItem = null;
+
+                foreach (var item in interfaceItems)
+                {
+                    if (item.CaptureDevice != null && item.CaptureDevice.Name == previouslySelectedDevice.Name)
+                    {
+                        matchedItem = item;
+                        break;
+                    }
+                }
+
+                DeviceList.SelectedItem = matchedItem;
             }
         }
 
@@ -119,6 +131,7 @@ namespace NetworkScanner
 
         private void RefreshInterfaces(object? sender, EventArgs e)
         {
+            // kick off the spin animation on the refresh icon so the user can see it's scanning
             if (FindResource("RefreshSpinStoryboard") is Storyboard storyboard)
             {
                 storyboard.Begin();
@@ -134,10 +147,10 @@ namespace NetworkScanner
 
         private void OpenPcap_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            OpenFileDialog openFileDialog = new OpenFileDialog // windows choose a file pop up
             {
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                Filter = "PCAP files (*.pcap;*.pcapng)|*.pcap;*.pcapng|All files (*.*)|*.*",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), //opens directory folder
+                Filter = "PCAP files (*.pcap;*.pcapng)|*.pcap;*.pcapng|All files (*.*)|*.*", // some filters
                 RestoreDirectory = true
             };
 

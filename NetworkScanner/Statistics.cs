@@ -1,4 +1,4 @@
-﻿using PacketDotNet;
+using PacketDotNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +7,7 @@ using static NetworkScanner.PacketScanner;
 
 namespace NetworkScanner
 {
+    // tracks packet counts per protocol and watches for syn and icmp floods
     public class Statistics
     {
         private const int MAX_SYN_PER_SECOND = Constants.MAX_SYN_PER_SECOND;
@@ -15,13 +16,16 @@ namespace NetworkScanner
         private ProtocolCount _protocolCount;
         private readonly object _protocolLock = new();
 
+        // key is "ip:port", holds the flood counters for each connection
         private readonly Dictionary<string, SocketStats> _sockets = new();
+        // once an ip gets flagged we add it here so we don't keep alerting for the same one
         private readonly HashSet<string> _blockedIps = new();
 
-        // Reference to the Scanner page so we can call RaiseAnomaly on it
+        // need this so we can trigger the red alert overlay on the ui when a flood is detected
         private Scanner _uiPage;
         public void SetUI(Scanner page) => _uiPage = page;
 
+        // gets wiped every second by PreventFloodAnomalies so counts always represent the current window
         private struct SocketStats
         {
             public string Ip { get; set; }
@@ -38,6 +42,7 @@ namespace NetworkScanner
             public int TCP, UDP, HTTP, HTTPS, ARP, ICMP, DHCP, DNS;
         }
 
+        // called from multiple worker threads at once so the lock matters here
         public void UpdateProtocolCount(in PacketInfo info)
         {
             lock (_protocolLock)
@@ -56,6 +61,7 @@ namespace NetworkScanner
             }
         }
 
+        // builds up syn and icmp counts per socket so PreventFloodAnomalies can read them each second
         public void UpdateFloodPreventionStats(Packet packet, PacketInfo info)
         {
             lock (_sockets)
@@ -65,6 +71,7 @@ namespace NetworkScanner
                 string key = MakeSocketKey(ip, port);
 
                 var tcp = packet.Extract<TcpPacket>();
+                // syn-ack is a normal handshake reply so we ignore it, only pure syn counts
                 bool isSyn = tcp != null && tcp.Synchronize && !tcp.Acknowledgment;
                 bool isIcmp = info.Protocol == "ICMP";
 
@@ -72,10 +79,12 @@ namespace NetworkScanner
                 {
                     if (isIcmp) { socket.Protocol = "ICMP"; socket.ICMPCount++; }
                     else if (isSyn) { socket.Protocol = "TCP"; socket.SYNCount++; }
+                    // SocketStats is a struct so TryGetValue gave us a copy, have to write it back
                     _sockets[key] = socket;
                 }
                 else
                 {
+                    // first time we've seen this ip:port, create a fresh entry for it
                     _sockets[key] = new SocketStats
                     {
                         Ip = ip,
@@ -88,6 +97,7 @@ namespace NetworkScanner
             }
         }
 
+        // runs forever on a background thread, wakes up every second to check if any ip crossed the threshold
         public void PreventFloodAnomalies()
         {
             while (true)
@@ -96,10 +106,13 @@ namespace NetworkScanner
 
                 lock (_sockets)
                 {
+                    // ToArray so we can safely update values inside the loop without hitting a collection-modified error
                     foreach (var key in _sockets.Keys.ToArray())
                     {
                         var socket = _sockets[key];
 
+                        // two separate ifs instead of else-if so both flood types get checked,
+                        // but _blockedIps prevents the same ip from triggering two alerts at once
                         if (socket.SYNCount > MAX_SYN_PER_SECOND && !_blockedIps.Contains(socket.Ip))
                         {
                             _blockedIps.Add(socket.Ip);
@@ -124,9 +137,10 @@ namespace NetworkScanner
                             AnomalyBlocker.BlockIcmp(socket.Ip);
                         }
 
+                        // wipe the counts so the next second window starts fresh
                         socket.SYNCount = 0;
                         socket.ICMPCount = 0;
-                        _sockets[key] = socket;
+                        _sockets[key] = socket; // struct, write the zeroed copy back
                     }
                 }
             }
@@ -136,6 +150,7 @@ namespace NetworkScanner
 
         public void ClearBlockedIps() => _blockedIps.Clear();
 
+        // returns a copy so the chart thread doesn't read the struct while the capture thread is writing it
         public ProtocolCount GetProtocolCountSnapshot()
         {
             lock (_protocolLock)

@@ -4,8 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace ScannerServer
 {
-    // מחלקה חדשה שמייצגת פרוטוקול בודד (למשל TCP והכמות שלו)
-    public class ProtocolStat : INotifyPropertyChanged
+    public class ProtocolStat : INotifyPropertyChanged // one row for a single protocol, like tcp and its count
     {
         private string _name;
         private int _count;
@@ -29,7 +28,7 @@ namespace ScannerServer
 
         public ObservableCollection<string> AgentAlerts { get; set; } = new ObservableCollection<string>();
 
-        // הרשימה החדשה שתחזיק את התגיות של הפרוטוקולים
+        // holds the protocol counts for this agent
         public ObservableCollection<ProtocolStat> Protocols { get; set; } = new ObservableCollection<ProtocolStat>();
 
         public event PropertyChangedEventHandler PropertyChanged;
